@@ -178,17 +178,16 @@ done
 ################################################################################
 
 
-# clone Genebuild_annotations; create the annotation log directory
+# create the annotation log directory
 ################################################################################
 cd "$ANNOTATION_CODE_DIRECTORY"
 
-git clone git@github.com:williamstark01/Genebuild_annotations.git
-cd Genebuild_annotations
-
-# create directory for keeping the annotation log and config files
-ANNOTATION_LOG_DIRECTORY="${ANNOTATION_CODE_DIRECTORY}/Genebuild_annotations/${ANNOTATION_NAME}"
+# create directory for storing the annotation config files
+ANNOTATION_LOG_DIRECTORY="${ANNOTATION_CODE_DIRECTORY}/annotation"
 mkdir --verbose "$ANNOTATION_LOG_DIRECTORY"
-################################################################################
+
+cd "$ANNOTATION_LOG_DIRECTORY"
+###############################################################################
 
 
 # generate some values
@@ -210,7 +209,7 @@ fi
 # generate .envrc
 ################################################################################
 envrc_path="${ANNOTATION_LOG_DIRECTORY}/.envrc"
-cp .envrc-template "$envrc_path"
+cp "$ENSCODE/ensembl-genes/scripts/annotation_setup/.envrc-template" "$envrc_path"
 
 sed --in-place -e "s/ASSEMBLY_ACCESSION_value/${ASSEMBLY_ACCESSION}/g" "$envrc_path"
 sed --in-place -e "s/SCIENTIFIC_NAME_value/${SCIENTIFIC_NAME}/g" "$envrc_path"
@@ -283,8 +282,6 @@ echo '```' >> "$annotation_log_path"
 
 # initialize the pipeline
 ################################################################################
-cd "$ANNOTATION_LOG_DIRECTORY"
-
 direnv allow
 
 # specify the Python virtual environment to use during annotation
@@ -310,9 +307,9 @@ direnv allow
 ################################################################################
 
 
-# create a git branch for the annotation
+# create a git repository for the config files
 ################################################################################
-git checkout -b "$ANNOTATION_NAME"
+git init
 
 git add annotation_log.md .envrc pipeline_config.ini .python-version pipeline_config.ini.cmds
 
