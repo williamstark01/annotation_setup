@@ -1,0 +1,87 @@
+# vim: set filetype=sh :
+
+# Genebuild annotation pipeline execution environment
+
+
+# annotation details and directory paths
+################################################################################
+export ASSEMBLY_ACCESSION="ASSEMBLY_ACCESSION_value"
+export SCIENTIFIC_NAME="SCIENTIFIC_NAME_value"
+export CLADE="CLADE_value"
+
+export ANNOTATION_NAME="ANNOTATION_NAME_value"
+
+export ANNOTATION_CODE_DIRECTORY="ANNOTATION_CODE_DIRECTORY_value"
+export ANNOTATION_LOG_DIRECTORY="ANNOTATION_LOG_DIRECTORY_value"
+export ANNOTATION_DATA_DIRECTORY="ANNOTATION_DATA_DIRECTORY_value"
+
+export ENSCODE="ENSCODE_value"
+
+export SERVER_SET="SERVER_SET_value"
+
+export EHIVE_URL=EHIVE_URL_value
+
+export EHIVE_PASS="ensembl"
+################################################################################
+
+
+# PERL5LIB
+################################################################################
+# pipeline dependencies
+PERL5LIB="${ENSCODE}/ensembl-analysis/modules"
+PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-compara/modules"
+PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-hive/modules"
+PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-io/modules"
+PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-killlist/modules"
+PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-production/modules"
+PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-taxonomy/modules"
+PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-variation/modules"
+PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl/modules"
+
+# datachecks dependencies
+PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-datacheck/lib"
+PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-metadata/modules"
+PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-orm/modules"
+
+# BioPerl
+ENSEMBL_SOFTWARE_HOME="/nfs/software/ensembl/RHEL7-JUL2017-core2"
+BIOPERL_LIB="${ENSEMBL_SOFTWARE_HOME}/linuxbrew/opt/bioperl-169/libexec"
+PERL5LIB="${PERL5LIB}:${BIOPERL_LIB}"
+
+export PERL5LIB
+################################################################################
+
+
+# PYTHONPATH
+################################################################################
+PYTHONPATH="${ENSCODE}/ensembl-genes/ensembl_genes"
+export PYTHONPATH
+################################################################################
+
+
+# PATH
+################################################################################
+PATH="${PATH}:${ENSCODE}/ensembl-compara/scripts/pipeline"
+PATH="${PATH}:${ENSCODE}/ensembl-hive/scripts"
+export PATH
+################################################################################
+
+
+# MySQL servers connection details
+################################################################################
+export GBS1="mysql-ens-genebuild-prod-1"
+export GBS2="mysql-ens-genebuild-prod-2"
+export GBS3="mysql-ens-genebuild-prod-3"
+export GBS4="mysql-ens-genebuild-prod-4"
+export GBS5="mysql-ens-genebuild-prod-5"
+export GBS6="mysql-ens-genebuild-prod-6"
+export GBS7="mysql-ens-genebuild-prod-7"
+
+export GBP1="4527"
+export GBP2="4528"
+export GBP3="4529"
+export GBP4="4530"
+export GBP5="4531"
+export GBP6="4532"
+export GBP7="4533"
+################################################################################
