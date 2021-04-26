@@ -320,17 +320,24 @@ git commit --all --message="import annotation config files"
 ################################################################################
 
 
-# print next steps for the user
+# create a tmux session for the annotation, start the pipeline
+################################################################################
+tmux_session_name=(${ANNOTATION_NAME//./_})
+
+# create a detached tmux session
+tmux new-session -d -s "$tmux_session_name"
+
+# start the pipeline
+tmux send-keys -t "${tmux_session_name}.0" 'beekeeper.pl -url $EHIVE_URL -loop -analyses_pattern "1..211"' ENTER
+################################################################################
+
+
+# print information for the user
 ################################################################################
 echo ""
 echo ""
 echo ""
-echo "go to the annotation log directory:"
-echo "cd \"$ANNOTATION_LOG_DIRECTORY\""
-echo ""
-echo "run to create a tmux session for the annotation:"
-echo 'tmux_session_name=(${ANNOTATION_NAME//./_}); tmux new -s "$tmux_session_name"'
-echo ""
-echo "start the pipeline:"
-echo 'beekeeper.pl -url $EHIVE_URL -loop -analyses_pattern "1..211"'
+echo "pipeline for annotation $ANNOTATION_NAME started"
+echo "attach to the annotation tmux session with:"
+echo "tmux attach-session -t $tmux_session_name"
 ################################################################################
