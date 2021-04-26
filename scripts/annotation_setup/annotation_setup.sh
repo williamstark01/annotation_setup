@@ -325,10 +325,10 @@ git commit --all --message="import annotation config files"
 tmux_session_name=(${ANNOTATION_NAME//./_})
 
 # create a detached tmux session
-tmux new-session -d -s "$tmux_session_name"
+tmux new-session -d -s "$tmux_session_name" -n "pipeline"
 
 # start the pipeline
-tmux send-keys -t "${tmux_session_name}.0" 'beekeeper.pl -url $EHIVE_URL -loop -analyses_pattern "1..211"' ENTER
+tmux send-keys -t "${tmux_session_name}:pipeline" 'beekeeper.pl -url $EHIVE_URL -loop -analyses_pattern "1..211"' ENTER
 ################################################################################
 
 
