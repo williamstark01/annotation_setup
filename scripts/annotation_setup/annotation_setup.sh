@@ -7,15 +7,24 @@ set -e
 
 script_filename="$0"
 
-docstring="Create an annotation code directory populated with code dependencies and
-development environment setup scripts for the Genebuild annotation of
-the genome assembly with the specified (GenBank) assembly accession.
+docstring='Create an annotation code directory populated with code dependencies and
+development environment setup scripts for the Genebuild annotation of the genome assembly
+with the specified (GenBank) assembly accession.
 
-The annotation code directory path by default has the format:
-/nfs/production/panda/ensembl/<username>/annotations/<Scientific_name>-<assembly accession>
-but can be also specified as an argument.
+Usage
 
-usage: $script_filename [-a|--assembly_accession] <assembly accession> [-s|--server_set <server set>] [-e|--enscode_directory <ENSCODE directory>] [-d|--directory <annotation code directory>]"
+    $script_filename [-a|--assembly_accession] <assembly accession> [-s|--server_set <server set>] [-e|--enscode_directory <ENSCODE directory>] [-d|--directory <annotation code directory>]
+
+
+Arguments
+
+    -s|--server_set <server set>
+        Specify the server set to use for the annotation. Defaults to selecting one of ["set1", "set2"] at random.
+    -e|--enscode_directory <ENSCODE directory>
+        Specify the path of the centralized `ENSCODE` directory. Uses the path in the global `ENSCODE` environment variable by default.
+    -d|--directory <annotation code directory>
+        Specify the path for the annotation code directory. Defaults to
+        `/nfs/production/panda/ensembl/<username>/annotations/<Scientific_name>-<assembly accession>`.'
 
 
 # print script help if run without arguments
