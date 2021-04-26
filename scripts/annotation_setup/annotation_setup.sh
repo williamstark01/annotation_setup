@@ -12,10 +12,10 @@ development environment setup scripts for the Genebuild annotation of
 the genome assembly with the specified (GenBank) assembly accession.
 
 The annotation code directory path by default has the format:
-/hps/nobackup2/production/ensembl/<username>/annotations/<Scientific_name>-<assembly accession>
+/nfs/production/panda/ensembl/<username>/annotations/<Scientific_name>-<assembly accession>
 but can be also specified as an argument.
 
-usage: $script_filename [-a|--assembly_accession] <assembly accession> -s|--server_set <server set> [-e|--enscode_directory <ENSCODE directory>] [-d|--directory <annotation code directory>]"
+usage: $script_filename [-a|--assembly_accession] <assembly accession> [-s|--server_set <server set>] [-e|--enscode_directory <ENSCODE directory>] [-d|--directory <annotation code directory>]"
 
 
 # print script help if run without arguments
@@ -131,7 +131,6 @@ CLADE="$(echo -e "${response}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$/
 scientific_name_underscores="${SCIENTIFIC_NAME// /_}"
 ANNOTATION_NAME="${scientific_name_underscores}-${ASSEMBLY_ACCESSION}"
 
-#annotations_code_root="/hps/nobackup2/production/ensembl/${USER}/annotations"
 annotations_code_root="/nfs/production/panda/ensembl/${USER}/annotations"
 
 if [[ -z "$ANNOTATION_CODE_DIRECTORY" ]]; then

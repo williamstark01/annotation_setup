@@ -11,6 +11,8 @@ A dedicated `enscode` directory is generated for the annotation to make it possi
 
 Furthermore, the setup script generates a `.envrc` file with all environment variables required by the annotation pipeline, which is automatically loaded by [direnv](https://direnv.net/) and isolates the annotation state from all other annotations and the user system-wide environment configuration.
 
+The directory for the annotation is created by default in the `/nfs/production/panda/ensembl/<username>/annotations/` directory and has the format `<Scientific_name>-<assembly accession>` but it can be also specified as an argument.
+
 
 ## enscode setup
 
