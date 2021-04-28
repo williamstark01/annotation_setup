@@ -199,14 +199,22 @@ cd "$ANNOTATION_LOG_DIRECTORY"
 ###############################################################################
 
 
-# generate some values
+# generate some values, create parent data directories
 ################################################################################
 annotations_data_root="/hps/nobackup2/production/ensembl/genebuild/production"
 
 annotation_data_clade_directory="${annotations_data_root}/${CLADE}"
 
 scientific_name_underscores_lower_case="${scientific_name_underscores,,}"
-ANNOTATION_DATA_DIRECTORY="${annotation_data_clade_directory}/${scientific_name_underscores_lower_case}/${ASSEMBLY_ACCESSION}"
+annotation_data_species_directory="${annotation_data_clade_directory}/${scientific_name_underscores_lower_case}"
+ANNOTATION_DATA_DIRECTORY="${annotation_data_species_directory}/${ASSEMBLY_ACCESSION}"
+
+# create parent data directories
+mkdir --parents --verbose "$annotation_data_clade_directory"
+mkdir --parents --verbose "$annotation_data_species_directory"
+# add write permission to file group
+chmod g+w "$annotation_data_clade_directory"
+chmod g+w "$annotation_data_species_directory"
 
 if [[ "$CLADE" == "teleostei" ]]; then
     projection_source_database=""
