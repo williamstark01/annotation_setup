@@ -100,6 +100,10 @@ fi
 
 # retrieve scientific name and clade from the assembly registry database
 ################################################################################
+# add MySQL commands directory to PATH
+mysql_commands_directory="/hps/software/users/ensembl/ensw/mysql-cmds/ensembl/bin"
+PATH="$mysql_commands_directory:$PATH"
+
 # get chain and version from the ASSEMBLY_ACCESSION string
 assembly_accession_array=(${ASSEMBLY_ACCESSION//./ })
 chain="${assembly_accession_array[0]}"
@@ -210,11 +214,11 @@ annotation_data_species_directory="${annotation_data_clade_directory}/${scientif
 ANNOTATION_DATA_DIRECTORY="${annotation_data_species_directory}/${ASSEMBLY_ACCESSION}"
 
 # create parent data directories
-mkdir --parents --verbose "$annotation_data_clade_directory"
-mkdir --parents --verbose "$annotation_data_species_directory"
+bsub -q production -Is mkdir --parents --verbose "$annotation_data_clade_directory"
+bsub -q production -Is mkdir --parents --verbose "$annotation_data_species_directory"
 # add write permission to file group
-chmod g+w "$annotation_data_clade_directory"
-chmod g+w "$annotation_data_species_directory"
+bsub -q production -Is chmod g+w "$annotation_data_clade_directory"
+bsub -q production -Is chmod g+w "$annotation_data_species_directory"
 
 if [[ "$CLADE" == "teleostei" ]]; then
     projection_source_database=""
@@ -226,7 +230,7 @@ fi
 # generate .envrc
 ################################################################################
 envrc_path="${ANNOTATION_LOG_DIRECTORY}/.envrc"
-cp "$ENSCODE/ensembl-genes/scripts/annotation_setup/.envrc-template" "$envrc_path"
+cp "${ENSCODE}/ensembl-genes/scripts/annotation_setup/.envrc-template" "$envrc_path"
 
 sed --in-place -e "s/ASSEMBLY_ACCESSION_value/${ASSEMBLY_ACCESSION}/g" "$envrc_path"
 sed --in-place -e "s/SCIENTIFIC_NAME_value/${SCIENTIFIC_NAME}/g" "$envrc_path"
@@ -290,9 +294,9 @@ echo "" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "## $(date '+%Y-%m-%d')" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
-echo 'run the pipeline up to analysis 211, "create_rnaseq_for_layer_db"' >> "$annotation_log_path"
+echo 'run the pipeline up to analysis 19, "create_transcript_selection_pipeline_job"' >> "$annotation_log_path"
 echo '```' >> "$annotation_log_path"
-echo 'beekeeper.pl -url $EHIVE_URL -loop -analyses_pattern "1..211"' >> "$annotation_log_path"
+echo 'beekeeper.pl -url $EHIVE_URL -loop -analyses_pattern "1..19"' >> "$annotation_log_path"
 echo '```' >> "$annotation_log_path"
 ################################################################################
 
@@ -309,11 +313,12 @@ source .envrc
 # set the global Python version to genebuild during initialization
 global_python_version=$(pyenv global)
 pyenv global genebuild
-perl "${ENSCODE}/ensembl-analysis/scripts/genebuild/create_annotation_configs.pl" -config_file pipeline_config.ini
+# run with "-current_genebuild 1" to overwrite existing genebuild annotation
+bsub -q production -Is perl "${ENSCODE}/ensembl-analysis/scripts/genebuild/create_annotation_configs.pl" -config_file pipeline_config.ini
 pyenv global "$global_python_version"
 
 pipeline_config_cmds_path="${ANNOTATION_LOG_DIRECTORY}/pipeline_config.ini.cmds"
-mv "${annotation_data_clade_directory}/pipeline_config.ini.cmds" "$pipeline_config_cmds_path"
+bsub -q production -Is mv "${annotation_data_clade_directory}/pipeline_config.ini.cmds" "$pipeline_config_cmds_path"
 ehive_url_line=$(grep "EHIVE_URL" "$pipeline_config_cmds_path")
 ehive_url_line_array=(${ehive_url_line//=/ })
 EHIVE_URL="${ehive_url_line_array[2]}"
