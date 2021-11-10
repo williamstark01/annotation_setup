@@ -5,6 +5,11 @@
 set -e
 
 
+# settings
+ENSEMBL_ANALYSIS_BRANCH="feature/main_alpha"
+ENSEMBL_COMPARA_BRANCH="release/98"
+
+
 script_filename=$0
 
 docstring="Create the ENSCODE Genebuild annotation codebase directory and retrieve
@@ -34,21 +39,21 @@ fi
 
 
 # Genebuild repositories
-git clone https://github.com/Ensembl/ensembl-analysis.git
+git clone --branch "$ENSEMBL_ANALYSIS_BRANCH" https://github.com/Ensembl/ensembl-analysis.git
 git clone https://github.com/Ensembl/ensembl-genes.git
 
-git clone --branch master https://github.com/Ensembl/ensembl.git
-git clone --branch master https://github.com/Ensembl/ensembl-io.git
-git clone --branch master https://github.com/Ensembl/ensembl-production.git
-git clone --branch master https://github.com/Ensembl/ensembl-hive.git
-git clone --branch release/98 https://github.com/Ensembl/ensembl-compara.git
+git clone https://github.com/Ensembl/ensembl.git
+git clone https://github.com/Ensembl/ensembl-io.git
+git clone https://github.com/Ensembl/ensembl-production.git
+git clone https://github.com/Ensembl/ensembl-hive.git
+git clone --branch "$ENSEMBL_COMPARA_BRANCH" https://github.com/Ensembl/ensembl-compara.git
 
 git clone https://github.com/Ensembl/ensembl-killlist.git
 git clone https://github.com/Ensembl/ensembl-taxonomy.git
 git clone https://github.com/Ensembl/ensembl-variation.git
 
 # datachecks
-git clone --branch release/103 https://github.com/Ensembl/ensembl-datacheck.git
-git clone --branch release/103 https://github.com/Ensembl/ensembl-funcgen.git
-git clone --branch release/103 https://github.com/Ensembl/ensembl-metadata.git
+git clone https://github.com/Ensembl/ensembl-datacheck.git
+git clone https://github.com/Ensembl/ensembl-funcgen.git
+git clone https://github.com/Ensembl/ensembl-metadata.git
 git clone https://github.com/Ensembl/ensembl-orm.git
