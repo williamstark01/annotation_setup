@@ -24,7 +24,7 @@ Arguments
         Specify the path of the centralized `ENSCODE` directory. Uses the path in the global `ENSCODE` environment variable by default.
     -d|--directory <annotation code directory>
         Specify the path for the annotation code directory. Defaults to
-        `/nfs/production/panda/ensembl/<username>/annotations/<Scientific_name>-<assembly accession>`.'
+        `/nfs/production/flicek/ensembl/genebuild/<username>/annotations/<Scientific_name>-<assembly accession>`.'
 
 
 # print script help if run without arguments
@@ -140,7 +140,7 @@ CLADE="$(echo -e "${response}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$/
 scientific_name_underscores="${SCIENTIFIC_NAME// /_}"
 ANNOTATION_NAME="${scientific_name_underscores}-${ASSEMBLY_ACCESSION}"
 
-annotations_code_root="/nfs/production/panda/ensembl/${USER}/annotations"
+annotations_code_root="/nfs/production/flicek/ensembl/genebuild/${USER}/annotations"
 
 if [[ -z "$ANNOTATION_CODE_DIRECTORY" ]]; then
     ANNOTATION_CODE_DIRECTORY="${annotations_code_root}/${ANNOTATION_NAME}"
@@ -201,7 +201,7 @@ cd "$ANNOTATION_LOG_DIRECTORY"
 
 # generate some values, create parent data directories
 ################################################################################
-annotations_data_root="/hps/nobackup2/production/ensembl/genebuild/production"
+annotations_data_root="/hps/nobackup/flicek/ensembl/genebuild/${USER}/annotations"
 
 annotation_data_clade_directory="${annotations_data_root}/${CLADE}"
 

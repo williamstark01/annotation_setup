@@ -44,8 +44,8 @@ PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-metadata/modules"
 PERL5LIB="${PERL5LIB}:${ENSCODE}/ensembl-orm/modules"
 
 # BioPerl
-ENSEMBL_SOFTWARE_HOME="/nfs/software/ensembl/RHEL7-JUL2017-core2"
-BIOPERL_LIB="${ENSEMBL_SOFTWARE_HOME}/linuxbrew/opt/bioperl-169/libexec"
+BIOPERL_LIB="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew/opt/bioperl-169/libexec"
+
 PERL5LIB="${PERL5LIB}:${BIOPERL_LIB}"
 
 export PERL5LIB
