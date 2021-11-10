@@ -43,4 +43,4 @@ optional arguments
 
 ## ENSCODE setup
 
-The `enscode_setup.sh` script simply creates from scratch a centralized `enscode` directory and populates it with all git repositories required by the Genebuild annotation and subsequent datachecks.
+The `enscode_setup.sh` script creates a centralized `enscode` directory and populates it with all code repositories required by the Genebuild annotation and subsequent datachecks.
