@@ -54,6 +54,5 @@ git clone https://github.com/Ensembl/ensembl-variation.git
 
 # datachecks
 git clone https://github.com/Ensembl/ensembl-datacheck.git
-git clone https://github.com/Ensembl/ensembl-funcgen.git
 git clone https://github.com/Ensembl/ensembl-metadata.git
 git clone https://github.com/Ensembl/ensembl-orm.git
