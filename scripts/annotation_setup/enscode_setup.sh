@@ -39,8 +39,8 @@ fi
 
 
 # Genebuild repositories
-git clone --branch "$ENSEMBL_ANALYSIS_BRANCH" https://github.com/Ensembl/ensembl-analysis.git
-git clone https://github.com/Ensembl/ensembl-genes.git
+git clone --branch "$ENSEMBL_ANALYSIS_BRANCH" git@github.com:Ensembl/ensembl-analysis.git
+git clone git@github.com:Ensembl/ensembl-genes.git
 
 git clone https://github.com/Ensembl/ensembl.git
 git clone https://github.com/Ensembl/ensembl-io.git
