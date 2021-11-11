@@ -347,7 +347,7 @@ tmux_session_name=(${ANNOTATION_NAME//./_})
 tmux new-session -d -s "$tmux_session_name" -n "pipeline"
 
 # start the pipeline
-tmux send-keys -t "${tmux_session_name}:pipeline" 'beekeeper.pl -url $EHIVE_URL -loop -analyses_pattern "1..211"' ENTER
+tmux send-keys -t "${tmux_session_name}:pipeline" 'beekeeper.pl -url $EHIVE_URL -loop -analyses_pattern "1..19"' ENTER
 ################################################################################
 
 
