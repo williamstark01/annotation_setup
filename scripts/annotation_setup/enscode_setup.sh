@@ -6,7 +6,7 @@ set -e
 
 
 # settings
-ENSEMBL_ANALYSIS_BRANCH="feature/main_alpha"
+ENSEMBL_ANALYSIS_BRANCH="main"
 ENSEMBL_COMPARA_BRANCH="release/98"
 
 
