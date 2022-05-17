@@ -24,7 +24,7 @@ if [[ -z $1 ]]; then
     kill -INT $$
 fi
 
-ENSCODE=$1
+ENSCODE=$(realpath $1)
 
 # create the ENSCODE directory if it doesn't exist
 mkdir --parents --verbose "$ENSCODE"
