@@ -39,20 +39,33 @@ fi
 
 
 # Genebuild repositories
+# https://github.com/Ensembl/ensembl-analysis
 git clone --branch "$ENSEMBL_ANALYSIS_BRANCH" git@github.com:Ensembl/ensembl-analysis.git
+# https://github.com/Ensembl/ensembl-genes
 git clone git@github.com:Ensembl/ensembl-genes.git
 
+# https://github.com/Ensembl/ensembl
 git clone https://github.com/Ensembl/ensembl.git
+# https://github.com/Ensembl/ensembl-io
 git clone https://github.com/Ensembl/ensembl-io.git
+# https://github.com/Ensembl/ensembl-production
 git clone https://github.com/Ensembl/ensembl-production.git
+# https://github.com/Ensembl/ensembl-hive
 git clone https://github.com/Ensembl/ensembl-hive.git
+# https://github.com/Ensembl/ensembl-compara
 git clone --branch "$ENSEMBL_COMPARA_BRANCH" https://github.com/Ensembl/ensembl-compara.git
 
+# https://github.com/Ensembl/ensembl-killlist
 git clone https://github.com/Ensembl/ensembl-killlist.git
+# https://github.com/Ensembl/ensembl-taxonomy
 git clone https://github.com/Ensembl/ensembl-taxonomy.git
+# https://github.com/Ensembl/ensembl-variation
 git clone https://github.com/Ensembl/ensembl-variation.git
 
 # datachecks
+# https://github.com/Ensembl/ensembl-datacheck
 git clone https://github.com/Ensembl/ensembl-datacheck.git
+# https://github.com/Ensembl/ensembl-metadata
 git clone https://github.com/Ensembl/ensembl-metadata.git
+# https://github.com/Ensembl/ensembl-orm
 git clone https://github.com/Ensembl/ensembl-orm.git
