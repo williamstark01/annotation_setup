@@ -6,7 +6,6 @@ set -e
 
 
 # settings
-ENSEMBL_ANALYSIS_BRANCH="main"
 ENSEMBL_COMPARA_BRANCH="release/98"
 
 
@@ -40,9 +39,11 @@ fi
 
 # Genebuild repositories
 # https://github.com/Ensembl/ensembl-analysis
-git clone --branch "$ENSEMBL_ANALYSIS_BRANCH" git@github.com:Ensembl/ensembl-analysis.git
+git clone git@github.com:Ensembl/ensembl-analysis.git
 # https://github.com/Ensembl/ensembl-genes
 git clone git@github.com:Ensembl/ensembl-genes.git
+# https://github.com/Ensembl/ensembl-anno
+git clone git@github.com:Ensembl/ensembl-anno.git
 
 # https://github.com/Ensembl/ensembl
 git clone https://github.com/Ensembl/ensembl.git
