@@ -244,14 +244,30 @@ cp --preserve "$pipeline_config_template_path" "$pipeline_config_path"
 # https://unix.stackexchange.com/questions/32907/what-characters-do-i-need-to-escape-when-using-sed-in-a-sh-script/33005#33005
 # https://en.wikipedia.org/wiki/Regular_expression#POSIX_basic_and_extended
 
-sed --in-place -e "s|'base_output_dir'              => '',|'base_output_dir'              => '$ANNOTATION_DATA_DIRECTORY',|g" "$pipeline_config_path"
+# "dbowner" line 47
+sed --in-place -e "s/'dbowner'                      => '',/'dbowner' => \$ENV{USER},/g" "$pipeline_config_path"
+
+# "base_output_dir" line 48
+sed --in-place -e "s|'base_output_dir'              => '',|'base_output_dir' => '$ANNOTATION_DATA_DIRECTORY',|g" "$pipeline_config_path"
 
 scientific_name_underscores_lower_case="${scientific_name_underscores,,}"
 assembly_accession_underscores="${ASSEMBLY_ACCESSION//./_}"
 assembly_accession_underscores_lower_case="${assembly_accession_underscores,,}"
-sed --in-place -e "s/'production_name'              => '' || \$self->o('species_name'),/'production_name'              => '$scientific_name_underscores_lower_case-$assembly_accession_underscores_lower_case' || \$self->o('species_name'),/g" "$pipeline_config_path"
 
-perl -0777 -i".backup" -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-      input_ids         => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
+# "production_name" line 60
+sed --in-place -e "s/'production_name'              => '' || \$self->o('species_name'),/'production_name' => '$scientific_name_underscores_lower_case-$assembly_accession_underscores_lower_case' || \$self->o('species_name'),/g" "$pipeline_config_path"
+
+# "user_r" line 62
+sed --in-place -e "s/'user_r'                       => '',/'user_r' => 'ensro',/g" "$pipeline_config_path"
+
+# "user" line 63
+sed --in-place -e "s/'user'                         => '',/'user' => 'ensadmin',/g" "$pipeline_config_path"
+
+# "password" line 64
+sed --in-place -e "s/'password'                     => '',/'password' => 'ensembl',/g" "$pipeline_config_path"
+
+# "input_ids" line 934
+perl -0777 -i".backup" -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-      input_ids => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
 ################################################################################
 
 
@@ -266,7 +282,22 @@ sed --in-place -e "s/#my \$current_genebuild  = 0;/my \$current_genebuild  = 1;/
 ################################################################################
 
 
-kill -INT $$
+# update load_environment.sh
+################################################################################
+load_environment_path="${ANNOTATION_LOG_DIRECTORY}/load_environment.sh"
+cp "${annotations_code_root}/annotation_setup/load_environment-template.sh" "$load_environment_path"
+
+sed --in-place -e "s/ASSEMBLY_ACCESSION_value/${ASSEMBLY_ACCESSION}/g" "$load_environment_path"
+sed --in-place -e "s/SCIENTIFIC_NAME_value/${SCIENTIFIC_NAME}/g" "$load_environment_path"
+
+sed --in-place -e "s/ANNOTATION_NAME_value/${ANNOTATION_NAME}/g" "$load_environment_path"
+
+sed --in-place -e "s|ANNOTATION_CODE_DIRECTORY_value|${ANNOTATION_CODE_DIRECTORY}|g" "$load_environment_path"
+sed --in-place -e "s|ANNOTATION_LOG_DIRECTORY_value|${ANNOTATION_LOG_DIRECTORY}|g" "$load_environment_path"
+sed --in-place -e "s|ANNOTATION_DATA_DIRECTORY_value|${ANNOTATION_DATA_DIRECTORY}|g" "$load_environment_path"
+
+sed --in-place -e "s|ENSCODE_value|${annotation_enscode_directory}|g" "$load_environment_path"
+################################################################################
 
 
 # generate annotation_log.md
@@ -298,54 +329,9 @@ echo '```' >> "$annotation_log_path"
 
 # initialize the pipeline
 ################################################################################
-source genebuild.sh
-
 source load_environment.sh
 
-ehive_url_line=$(grep "EHIVE_URL" "$pipeline_config_cmds_path")
-ehive_url_line_array=(${ehive_url_line//=/ })
-EHIVE_URL="${ehive_url_line_array[2]}"
+eHive_commands_path="$ANNOTATION_LOG_DIRECTORY/eHive_commands.txt"
 
-sed --in-place -e "s|EHIVE_URL_value|${EHIVE_URL}|g" "$envrc_path"
-
-direnv allow
-################################################################################
-
-
-# create a git repository for the config files
-################################################################################
-git init
-
-git add annotation_log.md load_environment.sh
-
-git commit --all --message="import files"
-################################################################################
-
-
-# create a tmux session for the annotation, start the pipeline
-################################################################################
-tmux_session_name=(${ANNOTATION_NAME//./_})
-
-# create a detached tmux session
-tmux new-session -d -s "$tmux_session_name" -n "pipeline"
-
-# start the pipeline
-tmux send-keys -t "${tmux_session_name}:pipeline" "beekeeper.pl --url $EHIVE_URL --loop" ENTER
-################################################################################
-
-
-# print information for the user
-################################################################################
-echo ""
-echo ""
-echo ""
-echo "$ANNOTATION_NAME annotation pipeline started"
-echo ""
-echo "attach to the annotation tmux session with:"
-echo "tmux attach-session -t $tmux_session_name"
-echo ""
-echo "view the running pipeline in guiHive:"
-echo "http://guihive.ebi.ac.uk:8080/"
-echo "+"
-echo "$EHIVE_URL"
-################################################################################
+init_pipeline.pl EnsemblAnnoBraker_conf.pm --hive_force_init 1
+#init_pipeline.pl EnsemblAnnoBraker_conf.pm --hive_force_init 1 >> "$eHive_commands_path"
