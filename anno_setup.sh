@@ -113,6 +113,9 @@ fi
 
 # remove leading and trailing whitespace characters
 SCIENTIFIC_NAME="$(echo -e "${response}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+
+echo "scientific name for $ASSEMBLY_ACCESSION: $SCIENTIFIC_NAME"
+echo
 ################################################################################
 
 
@@ -126,16 +129,24 @@ annotations_code_root="/nfs/production/flicek/ensembl/genebuild/${USER}/annotati
 if [[ -z "$ANNOTATION_CODE_DIRECTORY" ]]; then
     ANNOTATION_CODE_DIRECTORY="${annotations_code_root}/${ANNOTATION_NAME}"
 fi
-echo -e "annotation code directory:\n$ANNOTATION_CODE_DIRECTORY"
+echo "annotation code directory:"
+echo "$ANNOTATION_CODE_DIRECTORY"
+echo
+
+#mkdir --parents --verbose "$ANNOTATION_CODE_DIRECTORY"
+mkdir --parents "$ANNOTATION_CODE_DIRECTORY"
 
 annotation_enscode_directory="${ANNOTATION_CODE_DIRECTORY}/enscode"
 
-mkdir --parents --verbose "$annotation_enscode_directory"
+#mkdir --parents --verbose "$annotation_enscode_directory"
+mkdir --parents "$annotation_enscode_directory"
 ################################################################################
 
 
-# populate the annotation enscode directory
+# set up annotation enscode directory
 ################################################################################
+echo "setting up annotation enscode directory"
+
 cd "$enscode_directory"
 
 repository="ensembl-analysis"
@@ -147,6 +158,14 @@ git worktree add "${annotation_enscode_directory}/${repository}" "$ANNOTATION_NA
 cd "$enscode_directory"
 
 repository="ensembl-genes"
+cd "$repository"
+git worktree prune
+git branch -D "$ANNOTATION_NAME" &>/dev/null || true
+git branch "$ANNOTATION_NAME" "main"
+git worktree add "${annotation_enscode_directory}/${repository}" "$ANNOTATION_NAME"
+cd "$enscode_directory"
+
+repository="ensembl-anno"
 cd "$repository"
 git worktree prune
 git branch -D "$ANNOTATION_NAME" &>/dev/null || true
@@ -169,8 +188,11 @@ repositories=(
 )
 
 for repository in "${repositories[@]}"; do
-    ln --symbolic --verbose "${enscode_directory}/${repository}" "${annotation_enscode_directory}/${repository}"
+    #ln --symbolic --verbose "${enscode_directory}/${repository}" "${annotation_enscode_directory}/${repository}"
+    ln --symbolic "${enscode_directory}/${repository}" "${annotation_enscode_directory}/${repository}"
 done
+
+echo
 ################################################################################
 
 
@@ -180,7 +202,8 @@ cd "$ANNOTATION_CODE_DIRECTORY"
 
 # create directory for storing the annotation config files
 ANNOTATION_LOG_DIRECTORY="${ANNOTATION_CODE_DIRECTORY}/annotation"
-mkdir --verbose "$ANNOTATION_LOG_DIRECTORY"
+#mkdir --verbose "$ANNOTATION_LOG_DIRECTORY"
+mkdir "$ANNOTATION_LOG_DIRECTORY"
 
 cd "$ANNOTATION_LOG_DIRECTORY"
 ###############################################################################
@@ -196,21 +219,26 @@ ANNOTATION_DATA_DIRECTORY="${annotations_data_root}/${ANNOTATION_NAME}"
 JOB_QUEUE="short"
 
 # create parent data directories
-bsub -q $JOB_QUEUE -Is mkdir --parents --verbose "$ANNOTATION_DATA_DIRECTORY"
+#bsub -q $JOB_QUEUE -Is mkdir --parents --verbose "$ANNOTATION_DATA_DIRECTORY"
+bsub -q $JOB_QUEUE -Is mkdir --parents "$ANNOTATION_DATA_DIRECTORY"
 # add write permission to file group
-bsub -q $JOB_QUEUE -Is chmod --verbose g+w "$ANNOTATION_DATA_DIRECTORY"
+#bsub -q $JOB_QUEUE -Is chmod --verbose g+w "$ANNOTATION_DATA_DIRECTORY"
+bsub -q $JOB_QUEUE -Is chmod g+w "$ANNOTATION_DATA_DIRECTORY"
+
+echo
 ################################################################################
 
 
-# copy and update EnsemblAnno_conf.pm
+# update EnsemblAnnoBraker_conf.pm
 # existing file template:
-# https://github.com/Ensembl/ensembl-analysis/blob/experimental/gbiab/modules/Bio/EnsEMBL/Analysis/Hive/Config/EnsemblAnno_conf.pm
+# https://github.com/Ensembl/ensembl-analysis/blob/experimental/gbiab/modules/Bio/EnsEMBL/Analysis/Hive/Config/EnsemblAnnoBraker_conf.pm
 ################################################################################
-pipeline_config_path="${ANNOTATION_LOG_DIRECTORY}/EnsemblAnno_conf.pm"
+pipeline_config_path="${ANNOTATION_LOG_DIRECTORY}/EnsemblAnnoBraker_conf.pm"
 
-pipeline_config_template_path="${annotation_enscode_directory}/ensembl-analysis/modules/Bio/EnsEMBL/Analysis/Hive/Config/EnsemblAnno_conf.pm"
+pipeline_config_template_path="${annotation_enscode_directory}/ensembl-analysis/modules/Bio/EnsEMBL/Analysis/Hive/Config/EnsemblAnnoBraker_conf.pm"
 
-cp --preserve --verbose "$pipeline_config_template_path" "$pipeline_config_path"
+#cp --preserve --verbose "$pipeline_config_template_path" "$pipeline_config_path"
+cp --preserve "$pipeline_config_template_path" "$pipeline_config_path"
 
 # characters to escape in sed substitutions: ^.[]/\$*
 # https://unix.stackexchange.com/questions/32907/what-characters-do-i-need-to-escape-when-using-sed-in-a-sh-script/33005#33005
@@ -221,9 +249,9 @@ sed --in-place -e "s|'base_output_dir'              => '',|'base_output_dir'    
 scientific_name_underscores_lower_case="${scientific_name_underscores,,}"
 assembly_accession_underscores="${ASSEMBLY_ACCESSION//./_}"
 assembly_accession_underscores_lower_case="${assembly_accession_underscores,,}"
-sed --in-place -e "s/'production_name'              => '',/'production_name'              => '$scientific_name_underscores_lower_case-$assembly_accession_underscores_lower_case',/g" "$pipeline_config_path"
+sed --in-place -e "s/'production_name'              => '' || \$self->o('species_name'),/'production_name'              => '$scientific_name_underscores_lower_case-$assembly_accession_underscores_lower_case' || \$self->o('species_name'),/g" "$pipeline_config_path"
 
-sed --in-place -e "s/-input_ids         => \[\],/-input_ids         => \[{'assembly_accession' => '$ASSEMBLY_ACCESSION'}\],/g" "$pipeline_config_path"
+perl -0777 -i".backup" -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-      input_ids         => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
 ################################################################################
 
 
@@ -235,4 +263,89 @@ ProcessGCA_path="${annotation_enscode_directory}/ensembl-analysis/modules/Bio/En
 
 sed --in-place -e "s/my \$current_genebuild = \$self->param('current_genebuild');/#my \$current_genebuild = \$self->param('current_genebuild');/g" "$ProcessGCA_path"
 sed --in-place -e "s/#my \$current_genebuild  = 0;/my \$current_genebuild  = 1;/g" "$ProcessGCA_path"
+################################################################################
+
+
+kill -INT $$
+
+
+# generate annotation_log.md
+################################################################################
+annotation_log_path="${ANNOTATION_LOG_DIRECTORY}/annotation_log.md"
+
+echo "# $ANNOTATION_NAME" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "$SCIENTIFIC_NAME" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "$ASSEMBLY_ACCESSION" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "https://www.ncbi.nlm.nih.gov/assembly/$ASSEMBLY_ACCESSION" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "https://en.wikipedia.org/wiki/$scientific_name_underscores" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "## annotation" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "## $(date '+%Y-%m-%d')" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "start the pipeline" >> "$annotation_log_path"
+echo '```' >> "$annotation_log_path"
+echo "beekeeper.pl --url $EHIVE_URL --loop" >> "$annotation_log_path"
+echo '```' >> "$annotation_log_path"
+################################################################################
+
+
+# initialize the pipeline
+################################################################################
+source genebuild.sh
+
+source load_environment.sh
+
+ehive_url_line=$(grep "EHIVE_URL" "$pipeline_config_cmds_path")
+ehive_url_line_array=(${ehive_url_line//=/ })
+EHIVE_URL="${ehive_url_line_array[2]}"
+
+sed --in-place -e "s|EHIVE_URL_value|${EHIVE_URL}|g" "$envrc_path"
+
+direnv allow
+################################################################################
+
+
+# create a git repository for the config files
+################################################################################
+git init
+
+git add annotation_log.md load_environment.sh
+
+git commit --all --message="import files"
+################################################################################
+
+
+# create a tmux session for the annotation, start the pipeline
+################################################################################
+tmux_session_name=(${ANNOTATION_NAME//./_})
+
+# create a detached tmux session
+tmux new-session -d -s "$tmux_session_name" -n "pipeline"
+
+# start the pipeline
+tmux send-keys -t "${tmux_session_name}:pipeline" "beekeeper.pl --url $EHIVE_URL --loop" ENTER
+################################################################################
+
+
+# print information for the user
+################################################################################
+echo ""
+echo ""
+echo ""
+echo "$ANNOTATION_NAME annotation pipeline started"
+echo ""
+echo "attach to the annotation tmux session with:"
+echo "tmux attach-session -t $tmux_session_name"
+echo ""
+echo "view the running pipeline in guiHive:"
+echo "http://guihive.ebi.ac.uk:8080/"
+echo "+"
+echo "$EHIVE_URL"
 ################################################################################
