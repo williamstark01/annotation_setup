@@ -229,21 +229,34 @@ echo
 ################################################################################
 
 
-# update EnsemblAnnoBraker_conf.pm
-# existing file template:
-# https://github.com/Ensembl/ensembl-analysis/blob/experimental/gbiab/modules/Bio/EnsEMBL/Analysis/Hive/Config/EnsemblAnnoBraker_conf.pm
+# copy config files and store in a git repository
 ################################################################################
+# EnsemblAnnoBraker_conf.pm
+# file template:
+# https://github.com/Ensembl/ensembl-analysis/blob/experimental/gbiab/modules/Bio/EnsEMBL/Analysis/Hive/Config/EnsemblAnnoBraker_conf.pm
 pipeline_config_path="${ANNOTATION_LOG_DIRECTORY}/EnsemblAnnoBraker_conf.pm"
-
 pipeline_config_template_path="${annotation_enscode_directory}/ensembl-analysis/modules/Bio/EnsEMBL/Analysis/Hive/Config/EnsemblAnnoBraker_conf.pm"
-
 #cp --preserve --verbose "$pipeline_config_template_path" "$pipeline_config_path"
 cp --preserve "$pipeline_config_template_path" "$pipeline_config_path"
+
+# load_environment.sh
+load_environment_path="${ANNOTATION_LOG_DIRECTORY}/load_environment.sh"
+cp "${annotations_code_root}/annotation_setup/load_environment-template.sh" "$load_environment_path"
+
+git init
+git add EnsemblAnnoBraker_conf.pm load_environment.sh
+git commit --all --message="import config template files"
+echo
+################################################################################
+
 
 # characters to escape in sed substitutions: ^.[]/\$*
 # https://unix.stackexchange.com/questions/32907/what-characters-do-i-need-to-escape-when-using-sed-in-a-sh-script/33005#33005
 # https://en.wikipedia.org/wiki/Regular_expression#POSIX_basic_and_extended
 
+
+# update EnsemblAnnoBraker_conf.pm
+################################################################################
 # "dbowner" line 47
 sed --in-place -e "s/'dbowner'                      => '',/'dbowner' => \$ENV{USER},/g" "$pipeline_config_path"
 
@@ -284,9 +297,6 @@ sed --in-place -e "s/#my \$current_genebuild  = 0;/my \$current_genebuild  = 1;/
 
 # update load_environment.sh
 ################################################################################
-load_environment_path="${ANNOTATION_LOG_DIRECTORY}/load_environment.sh"
-cp "${annotations_code_root}/annotation_setup/load_environment-template.sh" "$load_environment_path"
-
 sed --in-place -e "s/ASSEMBLY_ACCESSION_value/${ASSEMBLY_ACCESSION}/g" "$load_environment_path"
 sed --in-place -e "s/SCIENTIFIC_NAME_value/${SCIENTIFIC_NAME}/g" "$load_environment_path"
 
@@ -300,6 +310,25 @@ sed --in-place -e "s|ENSCODE_value|${annotation_enscode_directory}|g" "$load_env
 ################################################################################
 
 
+# initialize the pipeline
+################################################################################
+source load_environment.sh
+
+eHive_commands_path="$ANNOTATION_LOG_DIRECTORY/eHive_commands.txt"
+
+init_pipeline.pl EnsemblAnnoBraker_conf.pm --hive_force_init 1 >> "$eHive_commands_path"
+
+ehive_url_line=$(grep "EHIVE_URL" "$eHive_commands_path" | grep "bash")
+
+ehive_url_line_array=(${ehive_url_line//\"/ })
+EHIVE_URL="${ehive_url_line_array[2]}"
+
+sed --in-place -e "s|EHIVE_URL_value|${EHIVE_URL}|g" "$load_environment_path"
+
+source load_environment.sh
+################################################################################
+
+
 # generate annotation_log.md
 ################################################################################
 annotation_log_path="${ANNOTATION_LOG_DIRECTORY}/annotation_log.md"
@@ -310,28 +339,31 @@ echo "$SCIENTIFIC_NAME" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "$ASSEMBLY_ACCESSION" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
-echo "https://www.ncbi.nlm.nih.gov/assembly/$ASSEMBLY_ACCESSION" >> "$annotation_log_path"
+echo "https://www.ncbi.nlm.nih.gov/assembly/${ASSEMBLY_ACCESSION}/" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "https://en.wikipedia.org/wiki/$scientific_name_underscores" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "## annotation" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
+echo "EHIVE_URL" >> "$annotation_log_path"
+echo '```' >> "$annotation_log_path"
+echo "$EHIVE_URL" >> "$annotation_log_path"
+echo '```' >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "## $(date '+%Y-%m-%d')" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "start the pipeline" >> "$annotation_log_path"
 echo '```' >> "$annotation_log_path"
-echo "beekeeper.pl --url $EHIVE_URL --loop" >> "$annotation_log_path"
+echo "beekeeper.pl --url \$EHIVE_URL --loop" >> "$annotation_log_path"
 echo '```' >> "$annotation_log_path"
 ################################################################################
 
 
-# initialize the pipeline
+# commit annotation_log.md, eHive_commands.txt and updated config files
 ################################################################################
-source load_environment.sh
-
-eHive_commands_path="$ANNOTATION_LOG_DIRECTORY/eHive_commands.txt"
-
-init_pipeline.pl EnsemblAnnoBraker_conf.pm --hive_force_init 1
-#init_pipeline.pl EnsemblAnnoBraker_conf.pm --hive_force_init 1 >> "$eHive_commands_path"
+git add annotation_log.md eHive_commands.txt
+git commit --all --message="add more and update config files"
+echo
+################################################################################
