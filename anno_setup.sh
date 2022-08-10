@@ -367,3 +367,33 @@ git add annotation_log.md eHive_commands.txt
 git commit --all --message="add more and update config files"
 echo
 ################################################################################
+
+
+# create a tmux session for the annotation, start the pipeline
+################################################################################
+tmux_session_name=(${ANNOTATION_NAME//./_})
+
+# create a detached tmux session
+tmux new-session -d -s "$tmux_session_name" -n "pipeline"
+
+# load environment
+tmux send-keys -t "${tmux_session_name}:pipeline" "source load_environment.sh" ENTER
+
+# start the pipeline
+tmux send-keys -t "${tmux_session_name}:pipeline" "beekeeper.pl --url $EHIVE_URL --loop" ENTER
+################################################################################
+
+
+# print information for the user
+################################################################################
+echo
+echo "$ANNOTATION_NAME annotation pipeline started"
+echo
+echo "attach to the annotation tmux session with:"
+echo "tmux attach-session -t $tmux_session_name"
+echo
+echo "view the running pipeline in guiHive:"
+echo "http://guihive.ebi.ac.uk:8080/"
+echo "+"
+echo "$EHIVE_URL"
+################################################################################
