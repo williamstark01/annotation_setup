@@ -280,7 +280,7 @@ sed --in-place -e "s/'user'                         => '',/'user' => 'ensadmin',
 sed --in-place -e "s/'password'                     => '',/'password' => 'ensembl',/g" "$pipeline_config_path"
 
 # "input_ids" line 934
-perl -0777 -i".backup" -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-      input_ids => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
+perl -0777 -i".backup" -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-input_ids => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
 ################################################################################
 
 
