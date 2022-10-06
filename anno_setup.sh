@@ -244,7 +244,8 @@ cp --preserve "$pipeline_config_template_path" "$pipeline_config_path"
 
 # load_environment.sh
 load_environment_path="${ANNOTATION_LOG_DIRECTORY}/load_environment.sh"
-cp "${annotations_code_root}/annotation_setup/load_environment-template.sh" "$load_environment_path"
+script_directory="$(dirname "$(readlink -f "$0")")"
+cp "${script_directory}/load_environment-template.sh" "$load_environment_path"
 
 git init
 git add EnsemblAnnoBraker_conf.pm load_environment.sh
