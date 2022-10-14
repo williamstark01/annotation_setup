@@ -13,7 +13,7 @@ with the specified (GenBank) assembly accession.
 
 Usage
 
-    $script_filename [-a|--assembly_accession] <assembly accession> [-s|--server_set <server set>] [-e|--enscode_directory <ENSCODE directory>] [-d|--directory <annotation code directory>]
+    $script_filename [-a|--assembly_accession] <assembly accession> [-s|--server_set <server set>] [-e|--enscode_directory <ENSCODE directory>] [-c|--code_directory <annotation code directory>]
 
 
 Arguments
@@ -22,7 +22,7 @@ Arguments
         Specify the server set to use for the annotation. Defaults to selecting one of ["set1", "set2"] at random.
     -e|--enscode_directory <ENSCODE directory>
         Specify the path of the centralized `ENSCODE` directory. Uses the path in the global `ENSCODE` environment variable by default.
-    -d|--directory <annotation code directory>
+    -c|--code_directory <annotation code directory>
         Specify the path for the annotation code directory. Defaults to
         `/nfs/production/flicek/ensembl/genebuild/<username>/annotations/<Scientific_name>-<assembly accession>`.'
 
@@ -36,8 +36,8 @@ fi
 
 # parse script arguments
 ################################################################################
-shortopts="a:s:e:d:"
-longopts="assembly_accession:,server_set:,enscode_directory:,directory:"
+shortopts="a:s:e:c:"
+longopts="assembly_accession:,server_set:,enscode_directory:,code_directory:"
 
 parsed=$(getopt --options="$shortopts" --longoptions="$longopts" --name "$0" -- "$@") || exit 1
 eval set -- "$parsed"
@@ -56,7 +56,7 @@ while true; do
             enscode_directory="$2"
             shift 2
             ;;
-        (-d|--directory)
+        (-c|--code_directory)
             ANNOTATION_CODE_DIRECTORY="$2"
             shift 2
             ;;
