@@ -72,6 +72,12 @@ fi
 ################################################################################
 
 
+# save the script directory
+################################################################################
+SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
+################################################################################
+
+
 # check the enscode_directory
 ################################################################################
 if [[ -z "$enscode_directory" ]] && [[ -z "$ENSCODE" ]]; then
@@ -114,7 +120,7 @@ fi
 # remove leading and trailing whitespace characters
 SCIENTIFIC_NAME="$(echo -e "${response}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
 
-echo "scientific name for $ASSEMBLY_ACCESSION: $SCIENTIFIC_NAME"
+echo "$ASSEMBLY_ACCESSION species scientific name: $SCIENTIFIC_NAME"
 echo
 ################################################################################
 
@@ -244,8 +250,7 @@ cp --preserve "$pipeline_config_template_path" "$pipeline_config_path"
 
 # load_environment.sh
 load_environment_path="${ANNOTATION_LOG_DIRECTORY}/load_environment.sh"
-script_directory="$(dirname "$(readlink -f "$0")")"
-cp "${script_directory}/load_environment-template.sh" "$load_environment_path"
+cp "${SCRIPT_DIRECTORY}/load_environment-template.sh" "$load_environment_path"
 
 git init
 git add EnsemblAnnoBraker_conf.pm load_environment.sh
@@ -261,29 +266,26 @@ echo
 
 # update EnsemblAnnoBraker_conf.pm
 ################################################################################
-# "dbowner" line 47
-sed --in-place -e "s/'dbowner'                      => '',/'dbowner' => \$ENV{USER},/g" "$pipeline_config_path"
-
-# "base_output_dir" line 48
+# "base_output_dir" line 47
 sed --in-place -e "s|'base_output_dir'              => '',|'base_output_dir' => '$ANNOTATION_DATA_DIRECTORY',|g" "$pipeline_config_path"
 
 scientific_name_underscores_lower_case="${scientific_name_underscores,,}"
 assembly_accession_underscores="${ASSEMBLY_ACCESSION//./_}"
 assembly_accession_underscores_lower_case="${assembly_accession_underscores,,}"
 
-# "production_name" line 60
+# "production_name" line 59
 sed --in-place -e "s/'production_name'              => '' || \$self->o('species_name'),/'production_name' => '$scientific_name_underscores_lower_case-$assembly_accession_underscores_lower_case' || \$self->o('species_name'),/g" "$pipeline_config_path"
 
-# "user_r" line 62
+# "user_r" line 61
 sed --in-place -e "s/'user_r'                       => '',/'user_r' => 'ensro',/g" "$pipeline_config_path"
 
-# "user" line 63
+# "user" line 62
 sed --in-place -e "s/'user'                         => '',/'user' => 'ensadmin',/g" "$pipeline_config_path"
 
-# "password" line 64
+# "password" line 63
 sed --in-place -e "s/'password'                     => '',/'password' => 'ensembl',/g" "$pipeline_config_path"
 
-# "input_ids" line 934
+# "input_ids" line 476
 perl -0777 -i".backup" -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-input_ids => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
 ################################################################################
 
