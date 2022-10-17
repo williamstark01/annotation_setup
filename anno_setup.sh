@@ -22,7 +22,9 @@ Arguments
         Specify the path of the centralized `ENSCODE` directory. Uses the path in the global `ENSCODE` environment variable by default.
     -c|--code_directory <annotation code directory>
         Specify the path for the annotation code directory. Defaults to
-        `/nfs/production/flicek/ensembl/genebuild/<username>/annotations/<Scientific_name>-<assembly accession>`.'
+        `/nfs/production/flicek/ensembl/genebuild/<username>/annotations/<Scientific_name>-<assembly accession>`.
+    -t|--test
+        Specify a test annotation, does not update the assembly registry database.'
 
 
 # print script help if run without arguments
@@ -34,8 +36,8 @@ fi
 
 # parse script arguments
 ################################################################################
-shortopts="a:e:c:"
-longopts="assembly_accession:,enscode_directory:,code_directory:"
+shortopts="a:e:c:t:"
+longopts="assembly_accession:,enscode_directory:,code_directory:,test:"
 
 parsed=$(getopt --options="$shortopts" --longoptions="$longopts" --name "$0" -- "$@") || exit 1
 eval set -- "$parsed"
@@ -52,6 +54,10 @@ while true; do
             ;;
         (-c|--code_directory)
             ANNOTATION_CODE_DIRECTORY="$2"
+            shift 2
+            ;;
+        (-t|--test)
+            TEST_RUN="$2"
             shift 2
             ;;
         (--)
@@ -287,6 +293,13 @@ sed --in-place -e "s/'password'                     => '',/'password' => 'ensemb
 
 # "input_ids" line 476
 perl -0777 -i".backup" -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-input_ids => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
+
+# set current_genebuild to 0 to disable updating the assembly registry database,
+# currently a noop
+if [[ -z "$TEST_RUN" ]]; then
+    # "current_genebuild" line 43
+    sed --in-place -e "s/'current_genebuild'            => 1,/'current_genebuild'            => 0,/g" "$pipeline_config_path"
+fi
 ################################################################################
 
 
