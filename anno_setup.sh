@@ -292,13 +292,13 @@ sed --in-place -e "s/'user'                         => '',/'user' => 'ensadmin',
 sed --in-place -e "s/'password'                     => '',/'password' => 'ensembl',/g" "$pipeline_config_path"
 
 # "input_ids" line 476
-perl -0777 -i".backup" -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-input_ids => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
+perl -0777 -i -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-input_ids => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
 
 # set current_genebuild to 0 to disable updating the assembly registry database,
 # currently a noop
 if [[ -z "$TEST_RUN" ]]; then
     # "current_genebuild" line 43
-    sed --in-place -e "s/'current_genebuild'            => 1,/'current_genebuild'            => 0,/g" "$pipeline_config_path"
+    sed --in-place -e "s/'current_genebuild'            => 1,/'current_genebuild' => 0,/g" "$pipeline_config_path"
 fi
 ################################################################################
 
@@ -352,6 +352,17 @@ source load_environment.sh
 ################################################################################
 annotation_log_path="${ANNOTATION_LOG_DIRECTORY}/annotation_log.md"
 
+# generate guiHive URL
+IFS='/' read -r -a ehive_url_array <<< "$EHIVE_URL"
+mysql_url="${ehive_url_array[2]}"
+IFS=':' read -r -a mysql_url_array <<< "$mysql_url"
+db_username="${mysql_url_array[0]}"
+IFS='@' read -r -a host_port_array <<< "${mysql_url_array[1]}"
+db_host="${host_port_array[1]}"
+db_port="${mysql_url_array[2]}"
+db_name="${ehive_url_array[3]}"
+guihive_url="http://guihive.ebi.ac.uk:8080/versions/96/?driver=mysql&username=$db_username&host=$db_host&port=$db_port&dbname=$db_name&passwd=xxxxx"
+
 echo "# $ANNOTATION_NAME" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "$SCIENTIFIC_NAME" >> "$annotation_log_path"
@@ -371,6 +382,9 @@ echo "EHIVE_URL" >> "$annotation_log_path"
 echo '```' >> "$annotation_log_path"
 echo "$EHIVE_URL" >> "$annotation_log_path"
 echo '```' >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "guiHive URL" >> "$annotation_log_path"
+echo "$guihive_url" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "## $(date '+%Y-%m-%d')" >> "$annotation_log_path"
@@ -413,8 +427,7 @@ echo
 echo "attach to the annotation tmux session with:"
 echo "tmux attach-session -t $tmux_session_name"
 echo
-echo "view the running pipeline in guiHive:"
-echo "http://guihive.ebi.ac.uk:8080/"
-echo "+"
-echo "$EHIVE_URL"
+echo "view the pipeline in guiHive:"
+echo "$guihive_url"
+echo
 ################################################################################
