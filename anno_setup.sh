@@ -415,7 +415,7 @@ tmux new-session -d -s "$tmux_session_name" -n "pipeline"
 tmux send-keys -t "${tmux_session_name}:pipeline" "source load_environment.sh" ENTER
 
 # start the pipeline
-tmux send-keys -t "${tmux_session_name}:pipeline" "beekeeper.pl --url $EHIVE_URL --loop" ENTER
+tmux send-keys -t "${tmux_session_name}:pipeline" "beekeeper.pl --url \$EHIVE_URL --loop" ENTER
 ################################################################################
 
 
