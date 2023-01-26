@@ -98,7 +98,7 @@ chain="${assembly_accession_array[0]}"
 version="${assembly_accession_array[1]}"
 
 get_scientific_name="
-SELECT meta.subspecies_name
+SELECT meta.species_name
 FROM assembly
 INNER JOIN meta
   ON assembly.assembly_id = meta.assembly_id
@@ -154,7 +154,8 @@ cd "$repository"
 git fetch origin
 git worktree prune
 git branch -D "$ANNOTATION_NAME" &>/dev/null || true
-git branch "$ANNOTATION_NAME" "origin/experimental/gbiab"
+#git branch "$ANNOTATION_NAME" "origin/experimental/gbiab"
+git branch "$ANNOTATION_NAME" "feature/fungi_clade"
 git worktree add "${annotation_enscode_directory}/${repository}" "$ANNOTATION_NAME"
 cd "$enscode_directory"
 
