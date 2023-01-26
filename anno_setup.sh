@@ -13,16 +13,18 @@ with the specified (GenBank) assembly accession.
 
 Usage
 
-    $script_filename [-a|--assembly_accession] <assembly accession> [-e|--enscode_directory <ENSCODE directory>] [-d|--directory <annotation code directory>]
+    $script_filename [-a|--assembly_accession] <assembly accession> [-e|--enscode_directory <ENSCODE directory>] [-c|--code_directory <annotation code directory>]
 
 
 Arguments
 
     -e|--enscode_directory <ENSCODE directory>
         Specify the path of the centralized `ENSCODE` directory. Uses the path in the global `ENSCODE` environment variable by default.
-    -d|--directory <annotation code directory>
+    -c|--code_directory <annotation code directory>
         Specify the path for the annotation code directory. Defaults to
-        `/nfs/production/flicek/ensembl/genebuild/<username>/annotations/<Scientific_name>-<assembly accession>`.'
+        `/nfs/production/flicek/ensembl/genebuild/<username>/annotations/<Scientific_name>-<assembly accession>`.
+    -t|--test
+        Specify a test annotation, does not update the assembly registry database.'
 
 
 # print script help if run without arguments
@@ -34,8 +36,8 @@ fi
 
 # parse script arguments
 ################################################################################
-shortopts="a:e:d:"
-longopts="assembly_accession:,,enscode_directory:,directory:"
+shortopts="a:e:c:t:"
+longopts="assembly_accession:,enscode_directory:,code_directory:,test:"
 
 parsed=$(getopt --options="$shortopts" --longoptions="$longopts" --name "$0" -- "$@") || exit 1
 eval set -- "$parsed"
@@ -50,8 +52,12 @@ while true; do
             enscode_directory="$2"
             shift 2
             ;;
-        (-d|--directory)
+        (-c|--code_directory)
             ANNOTATION_CODE_DIRECTORY="$2"
+            shift 2
+            ;;
+        (-t|--test)
+            TEST_RUN="$2"
             shift 2
             ;;
         (--)
@@ -69,6 +75,12 @@ remaining=("$@")
 if [[ -z "$ASSEMBLY_ACCESSION" ]] && [[ -n "$remaining" ]]; then
     ASSEMBLY_ACCESSION="$remaining"
 fi
+################################################################################
+
+
+# save the script directory
+################################################################################
+SCRIPT_DIRECTORY="$(dirname "$(readlink -f "$0")")"
 ################################################################################
 
 
@@ -114,7 +126,7 @@ fi
 # remove leading and trailing whitespace characters
 SCIENTIFIC_NAME="$(echo -e "${response}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
 
-echo "scientific name for $ASSEMBLY_ACCESSION: $SCIENTIFIC_NAME"
+echo "$ASSEMBLY_ACCESSION species scientific name: $SCIENTIFIC_NAME"
 echo
 ################################################################################
 
@@ -245,8 +257,7 @@ cp --preserve "$pipeline_config_template_path" "$pipeline_config_path"
 
 # load_environment.sh
 load_environment_path="${ANNOTATION_LOG_DIRECTORY}/load_environment.sh"
-script_directory="$(dirname "$(readlink -f "$0")")"
-cp "${script_directory}/load_environment-template.sh" "$load_environment_path"
+cp "${SCRIPT_DIRECTORY}/load_environment-template.sh" "$load_environment_path"
 
 git init
 git add EnsemblAnnoBraker_conf.pm load_environment.sh
@@ -262,30 +273,34 @@ echo
 
 # update EnsemblAnnoBraker_conf.pm
 ################################################################################
-# "dbowner" line 47
-sed --in-place -e "s/'dbowner'                      => '',/'dbowner' => \$ENV{USER},/g" "$pipeline_config_path"
-
-# "base_output_dir" line 48
+# "base_output_dir" line 47
 sed --in-place -e "s|'base_output_dir'              => '',|'base_output_dir' => '$ANNOTATION_DATA_DIRECTORY',|g" "$pipeline_config_path"
 
 scientific_name_underscores_lower_case="${scientific_name_underscores,,}"
 assembly_accession_underscores="${ASSEMBLY_ACCESSION//./_}"
 assembly_accession_underscores_lower_case="${assembly_accession_underscores,,}"
 
-# "production_name" line 60
+# "production_name" line 59
 sed --in-place -e "s/'production_name'              => '' || \$self->o('species_name'),/'production_name' => '$scientific_name_underscores_lower_case-$assembly_accession_underscores_lower_case' || \$self->o('species_name'),/g" "$pipeline_config_path"
 
-# "user_r" line 62
+# "user_r" line 61
 sed --in-place -e "s/'user_r'                       => '',/'user_r' => 'ensro',/g" "$pipeline_config_path"
 
-# "user" line 63
+# "user" line 62
 sed --in-place -e "s/'user'                         => '',/'user' => 'ensadmin',/g" "$pipeline_config_path"
 
-# "password" line 64
+# "password" line 63
 sed --in-place -e "s/'password'                     => '',/'password' => 'ensembl',/g" "$pipeline_config_path"
 
-# "input_ids" line 934
-perl -0777 -i".backup" -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-input_ids => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
+# "input_ids" line 476
+perl -0777 -i -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-input_ids => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
+
+# set current_genebuild to 0 to disable updating the assembly registry database,
+# currently a noop
+if [[ -z "$TEST_RUN" ]]; then
+    # "current_genebuild" line 43
+    sed --in-place -e "s/'current_genebuild'            => 1,/'current_genebuild' => 0,/g" "$pipeline_config_path"
+fi
 ################################################################################
 
 
@@ -338,6 +353,17 @@ source load_environment.sh
 ################################################################################
 annotation_log_path="${ANNOTATION_LOG_DIRECTORY}/annotation_log.md"
 
+# generate guiHive URL
+IFS='/' read -r -a ehive_url_array <<< "$EHIVE_URL"
+mysql_url="${ehive_url_array[2]}"
+IFS=':' read -r -a mysql_url_array <<< "$mysql_url"
+db_username="${mysql_url_array[0]}"
+IFS='@' read -r -a host_port_array <<< "${mysql_url_array[1]}"
+db_host="${host_port_array[1]}"
+db_port="${mysql_url_array[2]}"
+db_name="${ehive_url_array[3]}"
+guihive_url="http://guihive.ebi.ac.uk:8080/versions/96/?driver=mysql&username=$db_username&host=$db_host&port=$db_port&dbname=$db_name&passwd=xxxxx"
+
 echo "# $ANNOTATION_NAME" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "$SCIENTIFIC_NAME" >> "$annotation_log_path"
@@ -345,6 +371,8 @@ echo "" >> "$annotation_log_path"
 echo "$ASSEMBLY_ACCESSION" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "https://www.ncbi.nlm.nih.gov/assembly/${ASSEMBLY_ACCESSION}/" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "https://www.ncbi.nlm.nih.gov/data-hub/genome/${ASSEMBLY_ACCESSION}/" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "https://en.wikipedia.org/wiki/$scientific_name_underscores" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
@@ -355,6 +383,9 @@ echo "EHIVE_URL" >> "$annotation_log_path"
 echo '```' >> "$annotation_log_path"
 echo "$EHIVE_URL" >> "$annotation_log_path"
 echo '```' >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "guiHive URL" >> "$annotation_log_path"
+echo "$guihive_url" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "## $(date '+%Y-%m-%d')" >> "$annotation_log_path"
@@ -385,7 +416,7 @@ tmux new-session -d -s "$tmux_session_name" -n "pipeline"
 tmux send-keys -t "${tmux_session_name}:pipeline" "source load_environment.sh" ENTER
 
 # start the pipeline
-tmux send-keys -t "${tmux_session_name}:pipeline" "beekeeper.pl --url $EHIVE_URL --loop" ENTER
+tmux send-keys -t "${tmux_session_name}:pipeline" "beekeeper.pl --url \$EHIVE_URL --loop" ENTER
 ################################################################################
 
 
@@ -397,8 +428,7 @@ echo
 echo "attach to the annotation tmux session with:"
 echo "tmux attach-session -t $tmux_session_name"
 echo
-echo "view the running pipeline in guiHive:"
-echo "http://guihive.ebi.ac.uk:8080/"
-echo "+"
-echo "$EHIVE_URL"
+echo "view the pipeline in guiHive:"
+echo "$guihive_url"
+echo
 ################################################################################
