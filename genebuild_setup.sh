@@ -110,7 +110,7 @@ chain="${assembly_accession_array[0]}"
 version="${assembly_accession_array[1]}"
 
 get_scientific_name="
-SELECT meta.subspecies_name
+SELECT meta.species_name
 FROM assembly
 INNER JOIN meta
   ON assembly.assembly_id = meta.assembly_id
