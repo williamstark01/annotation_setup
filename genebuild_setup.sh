@@ -230,7 +230,8 @@ fi
 # generate .envrc
 ################################################################################
 envrc_path="${ANNOTATION_LOG_DIRECTORY}/.envrc"
-cp "${ENSCODE}/ensembl-genes/scripts/annotation_setup/.envrc-template" "$envrc_path"
+#cp "${ENSCODE}/ensembl-genes/scripts/annotation_setup/.envrc-template" "$envrc_path"
+cp "${ANNOTATION_CODE_DIRECTORY}/annotation/.envrc-template" "$envrc_path"
 
 sed --in-place -e "s/ASSEMBLY_ACCESSION_value/${ASSEMBLY_ACCESSION}/g" "$envrc_path"
 sed --in-place -e "s/SCIENTIFIC_NAME_value/${SCIENTIFIC_NAME}/g" "$envrc_path"
