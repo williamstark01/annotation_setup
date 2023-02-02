@@ -44,10 +44,10 @@ fi
 # export HOMEBREW_ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
 # export ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
 # 
-# export LINUXBREW_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
-# export PATH="$LINUXBREW_HOME/bin:$LINUXBREW_HOME/sbin:$PATH"
-# export MANPATH="$LINUXBREW_HOME/share/man:$MANPATH"
-# export INFOPATH="$LINUXBREW_HOME/share/info:$INFOPATH"
+export LINUXBREW_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
+export PATH="$LINUXBREW_HOME/bin:$LINUXBREW_HOME/sbin:$PATH"
+export MANPATH="$LINUXBREW_HOME/share/man:$MANPATH"
+export INFOPATH="$LINUXBREW_HOME/share/info:$INFOPATH"
 # ################################################################################
 
 
