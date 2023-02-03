@@ -166,17 +166,17 @@ cd "$repository"
 git fetch origin
 git worktree prune
 git branch -D "$ANNOTATION_NAME" &>/dev/null || true
-git worktree add "${annotation_enscode_directory}/${repository}" -b "$ANNOTATION_NAME"
+git branch "$ANNOTATION_NAME" "origin/main"
+git worktree add "${annotation_enscode_directory}/${repository}" "$ANNOTATION_NAME"
 cd "$enscode_directory"
 
 repository="ensembl-genes"
-cd "$repository"
 cd "$repository"
 git fetch origin
 git worktree prune
 git branch -D "$ANNOTATION_NAME" &>/dev/null || true
 git branch "$ANNOTATION_NAME" "origin/main"
-git worktree add "${annotation_enscode_directory}/${repository}" -b "$ANNOTATION_NAME"
+git worktree add "${annotation_enscode_directory}/${repository}"  "$ANNOTATION_NAME"
 cd "$enscode_directory"
 
 
