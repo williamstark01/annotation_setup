@@ -163,13 +163,23 @@ cd "$enscode_directory"
 
 repository="ensembl-analysis"
 cd "$repository"
+git fetch origin
+git worktree prune
+git branch -D "$ANNOTATION_NAME" &>/dev/null || true
 git worktree add "${annotation_enscode_directory}/${repository}" -b "$ANNOTATION_NAME"
-cd -
+cd "$enscode_directory"
 
 repository="ensembl-genes"
 cd "$repository"
+cd "$repository"
+git fetch origin
+git worktree prune
+git branch -D "$ANNOTATION_NAME" &>/dev/null || true
+git branch "$ANNOTATION_NAME" "origin/main"
 git worktree add "${annotation_enscode_directory}/${repository}" -b "$ANNOTATION_NAME"
-cd -
+cd "$enscode_directory"
+
+
 
 repositories=(
     "ensembl"
@@ -227,23 +237,22 @@ fi
 ################################################################################
 
 
-# generate .envrc
+# generate load_genebuild_environment
 ################################################################################
-envrc_path="${ANNOTATION_LOG_DIRECTORY}/.envrc"
-#cp "${ENSCODE}/ensembl-genes/scripts/annotation_setup/.envrc-template" "$envrc_path"
-cp "${annotations_code_root}/annotation_setup/.envrc-template" "$envrc_path"
+load_environment_path="${ANNOTATION_LOG_DIRECTORY}/load_genebuild_environment.sh"
+cp "${annotations_code_root}/annotation_setup/load_genebuild_environment-template.sh" "$load_environment_path"
 
-sed --in-place -e "s/ASSEMBLY_ACCESSION_value/${ASSEMBLY_ACCESSION}/g" "$envrc_path"
-sed --in-place -e "s/SCIENTIFIC_NAME_value/${SCIENTIFIC_NAME}/g" "$envrc_path"
-sed --in-place -e "s/CLADE_value/${CLADE}/g" "$envrc_path"
-sed --in-place -e "s/ANNOTATION_NAME_value/${ANNOTATION_NAME}/g" "$envrc_path"
+sed --in-place -e "s/ASSEMBLY_ACCESSION_value/${ASSEMBLY_ACCESSION}/g" "$load_environment_path"
+sed --in-place -e "s/SCIENTIFIC_NAME_value/${SCIENTIFIC_NAME}/g" "$load_environment_path"
+sed --in-place -e "s/CLADE_value/${CLADE}/g" "$load_environment_path"
+sed --in-place -e "s/ANNOTATION_NAME_value/${ANNOTATION_NAME}/g" "$load_environment_path"
 
-sed --in-place -e "s|ANNOTATION_CODE_DIRECTORY_value|${ANNOTATION_CODE_DIRECTORY}|g" "$envrc_path"
-sed --in-place -e "s|ANNOTATION_LOG_DIRECTORY_value|${ANNOTATION_LOG_DIRECTORY}|g" "$envrc_path"
-sed --in-place -e "s|ANNOTATION_DATA_DIRECTORY_value|${ANNOTATION_DATA_DIRECTORY}|g" "$envrc_path"
+sed --in-place -e "s|ANNOTATION_CODE_DIRECTORY_value|${ANNOTATION_CODE_DIRECTORY}|g" "$load_environment_path"
+sed --in-place -e "s|ANNOTATION_LOG_DIRECTORY_value|${ANNOTATION_LOG_DIRECTORY}|g" "$load_environment_path"
+sed --in-place -e "s|ANNOTATION_DATA_DIRECTORY_value|${ANNOTATION_DATA_DIRECTORY}|g" "$load_environment_path"
 
-sed --in-place -e "s|ENSCODE_value|${annotation_enscode_directory}|g" "$envrc_path"
-sed --in-place -e "s|SERVER_SET_value|${SERVER_SET}|g" "$envrc_path"
+sed --in-place -e "s|ENSCODE_value|${annotation_enscode_directory}|g" "$load_environment_path"
+sed --in-place -e "s|SERVER_SET_value|${SERVER_SET}|g" "$load_environment_path"
 ################################################################################
 
 
@@ -304,12 +313,11 @@ echo '```' >> "$annotation_log_path"
 
 # initialize the pipeline
 ################################################################################
-direnv allow
 
 # specify the Python virtual environment to use during annotation
 pyenv local genebuild
 
-source .envrc
+source load_genebuild_environment.sh
 
 # set the global Python version to genebuild during initialization
 global_python_version=$(pyenv global)
@@ -324,9 +332,8 @@ ehive_url_line=$(grep "EHIVE_URL" "$pipeline_config_cmds_path")
 ehive_url_line_array=(${ehive_url_line//=/ })
 EHIVE_URL="${ehive_url_line_array[2]}"
 
-sed --in-place -e "s|EHIVE_URL_value|${EHIVE_URL}|g" "$envrc_path"
+sed --in-place -e "s|EHIVE_URL_value|${EHIVE_URL}|g" "$load_environment_path"
 
-direnv allow
 ################################################################################
 
 
@@ -334,7 +341,7 @@ direnv allow
 ################################################################################
 git init
 
-git add annotation_log.md .envrc pipeline_config.ini .python-version pipeline_config.ini.cmds
+git add annotation_log.md load_genebuild_environment.sh pipeline_config.ini .python-version pipeline_config.ini.cmds
 
 git commit --all --message="import annotation config files"
 ################################################################################
@@ -346,6 +353,9 @@ tmux_session_name=(${ANNOTATION_NAME//./_})
 
 # create a detached tmux session
 tmux new-session -d -s "$tmux_session_name" -n "pipeline"
+
+# load environment
+tmux send-keys -t "${tmux_session_name}:pipeline" "source load_genebuild_environment.sh" ENTER
 
 # start the pipeline
 tmux send-keys -t "${tmux_session_name}:pipeline" 'beekeeper.pl -url $EHIVE_URL -loop -analyses_pattern "1..19"' ENTER
