@@ -43,13 +43,13 @@ fi
 ################################################################################
 
 ### plenv
-PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
-if [[ -d "$PLENV_ROOT" ]]; then
-    export PLENV_ROOT
-    #export HOMEBREW_PLENV_ROOT="$PLENV_ROOT"
-    export PATH="${PLENV_ROOT}/bin:$PATH"
-    eval "$(plenv init -)"
-fi
+#PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
+#if [[ -d "$PLENV_ROOT" ]]; then
+#    export PLENV_ROOT
+##export HOMEBREW_PLENV_ROOT="$PLENV_ROOT"
+#    export PATH="${PLENV_ROOT}/bin:$PATH"
+#    eval "$(plenv init -)"
+#fi
 
 # genebuild.sh
 ################################################################################
@@ -76,10 +76,10 @@ fi
 # # /hps/software/users/ensembl/ensw/latest/envs/minimal.sh
 # # /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
 # export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge
-# 
+#
 # export HOMEBREW_ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
 # export ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
-# 
+#
 #export LINUXBREW_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
 #export PATH="$LINUXBREW_HOME/bin:$LINUXBREW_HOME/sbin:$PATH"
 #export MANPATH="$LINUXBREW_HOME/share/man:$MANPATH"

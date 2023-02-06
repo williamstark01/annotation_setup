@@ -315,16 +315,16 @@ echo '```' >> "$annotation_log_path"
 ################################################################################
 
 # specify the Python virtual environment to use during annotation
-pyenv local genebuild
+#pyenv local genebuild
 
 source load_genebuild_environment.sh
 
 # set the global Python version to genebuild during initialization
-global_python_version=$(pyenv global)
-pyenv global genebuild
+#global_python_version=$(pyenv global)
+#pyenv global genebuild
 # run with "-current_genebuild 1" to overwrite existing genebuild annotation
 bsub -q production -Is perl "${ENSCODE}/ensembl-analysis/scripts/genebuild/create_annotation_configs.pl" -config_file pipeline_config.ini
-pyenv global "$global_python_version"
+#pyenv global "$global_python_version"
 
 pipeline_config_cmds_path="${ANNOTATION_LOG_DIRECTORY}/pipeline_config.ini.cmds"
 bsub -q production -Is mv "${annotation_data_clade_directory}/pipeline_config.ini.cmds" "$pipeline_config_cmds_path"
@@ -334,6 +334,7 @@ EHIVE_URL="${ehive_url_line_array[2]}"
 
 sed --in-place -e "s|EHIVE_URL_value|${EHIVE_URL}|g" "$load_environment_path"
 
+source load_genebuild_environment.sh
 ################################################################################
 
 
