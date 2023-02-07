@@ -42,9 +42,21 @@ export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybrid
 if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh ]; then
   . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh
 fi
-if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh ]; then
-  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
-fi
+
+#if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh ]; then
+#  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
+#fi
+# linuxbrew.sh (complete copy)
+################################################################################
+export HOMEBREW_ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
+export ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
+
+export LINUXBREW_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
+export PATH="$LINUXBREW_HOME/bin:$LINUXBREW_HOME/sbin:$PATH"
+export MANPATH="$LINUXBREW_HOME/share/man:$MANPATH"
+export INFOPATH="$LINUXBREW_HOME/share/info:$INFOPATH"
+################################################################################
+
 #if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh ]; then
 #  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh
 #fi
