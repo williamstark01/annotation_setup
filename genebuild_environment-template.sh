@@ -45,9 +45,27 @@ fi
 if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh ]; then
   . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
 fi
-if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh ]; then
-  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh
+#if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh ]; then
+#  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh
+#fi
+# plenv.sh (complete copy)
+################################################################################
+export PLENV_ROOT=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv
+if [ -d "${PLENV_ROOT}" ]; then
+    export HOMEBREW_PLENV_ROOT=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv
+    export PATH="$PLENV_ROOT/bin:$PATH"
+    eval "$(plenv init -)"
 fi
+# Only run if we have brew
+brew_root=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
+if [ -d $brew_root ]; then
+  brew_htslib=$brew_root/opt/htslib
+  if [ -d $brew_htslib ]; then
+    export HTSLIB_DIR=${brew_htslib}
+  fi
+fi
+################################################################################
+
 if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh ]; then
   . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh
 fi
