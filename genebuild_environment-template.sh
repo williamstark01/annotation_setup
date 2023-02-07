@@ -1,5 +1,3 @@
-# vim: set filetype=sh :
-
 # Genebuild annotation pipeline execution environment
 
 
@@ -44,16 +42,6 @@ fi
 ################################################################################
 
 
-### plenv
-#PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
-#if [[ -d "$PLENV_ROOT" ]]; then
-#    export PLENV_ROOT
-##export HOMEBREW_PLENV_ROOT="$PLENV_ROOT"
-#    export PATH="${PLENV_ROOT}/bin:$PATH"
-#    eval "$(plenv init -)"
-#fi
-
-
 # genebuild.sh
 ################################################################################
 export GB_SCRATCH=/hps/nobackup/flicek/ensembl/genebuild
@@ -75,6 +63,16 @@ fi
 ################################################################################
 
 
+# ### plenv
+# PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
+# if [[ -d "$PLENV_ROOT" ]]; then
+#     export PLENV_ROOT
+#     #export HOMEBREW_PLENV_ROOT="$PLENV_ROOT"
+#     export PATH="${PLENV_ROOT}/bin:$PATH"
+#     eval "$(plenv init -)"
+# fi
+
+
 # # Homebrew (Linuxbrew)
 # ################################################################################
 # # /hps/software/users/ensembl/ensw/latest/envs/minimal.sh
@@ -84,11 +82,19 @@ fi
 # export HOMEBREW_ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
 # export ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
 #
-#export LINUXBREW_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
-#export PATH="$LINUXBREW_HOME/bin:$LINUXBREW_HOME/sbin:$PATH"
-#export MANPATH="$LINUXBREW_HOME/share/man:$MANPATH"
-#export INFOPATH="$LINUXBREW_HOME/share/info:$INFOPATH"
+# export LINUXBREW_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
+# export PATH="$LINUXBREW_HOME/bin:$LINUXBREW_HOME/sbin:$PATH"
+# export MANPATH="$LINUXBREW_HOME/share/man:$MANPATH"
+# export INFOPATH="$LINUXBREW_HOME/share/info:$INFOPATH"
 # ################################################################################
+
+
+# # MySQL commands
+# # https://www.ebi.ac.uk/seqdb/confluence/display/ENS/MySQL+commands
+# mysql_commands_directory="/hps/software/users/ensembl/ensw/mysql-cmds/ensembl/bin"
+# if [[ -d "$mysql_commands_directory" ]]; then
+#     export PATH="$mysql_commands_directory:$PATH"
+# fi
 
 
 # PERL5LIB
@@ -118,7 +124,7 @@ export PERL5LIB
 ################################################################################
 
 
-# PYTHONPATH
+# Python
 ################################################################################
 PYTHONPATH="${ENSCODE}/ensembl-genes/ensembl_genes"
 export PYTHONPATH
