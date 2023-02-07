@@ -24,6 +24,7 @@ export EHIVE_URL=EHIVE_URL_value
 export EHIVE_PASS="ensembl"
 ################################################################################
 
+
 # minimal.sh
 ################################################################################
 export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge
@@ -42,6 +43,7 @@ if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh
 fi
 ################################################################################
 
+
 ### plenv
 #PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
 #if [[ -d "$PLENV_ROOT" ]]; then
@@ -50,6 +52,7 @@ fi
 #    export PATH="${PLENV_ROOT}/bin:$PATH"
 #    eval "$(plenv init -)"
 #fi
+
 
 # genebuild.sh
 ################################################################################
@@ -69,8 +72,9 @@ fi
 if [[ -d "/nfs/production/panda/ensembl/production/ensemblftp/data_files" ]];then
   export FTP_DIR="/nfs/production/panda/ensembl/production/ensemblftp/data_files"
 fi
-
 ################################################################################
+
+
 # # Homebrew (Linuxbrew)
 # ################################################################################
 # # /hps/software/users/ensembl/ensw/latest/envs/minimal.sh
@@ -118,6 +122,7 @@ export PERL5LIB
 ################################################################################
 PYTHONPATH="${ENSCODE}/ensembl-genes/ensembl_genes"
 export PYTHONPATH
+
 export PYENV_VERSION="genebuild"
 ################################################################################
 

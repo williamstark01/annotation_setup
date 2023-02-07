@@ -166,8 +166,7 @@ cd "$repository"
 git fetch origin
 git worktree prune
 git branch -D "$ANNOTATION_NAME" &>/dev/null || true
-#git branch "$ANNOTATION_NAME" "origin/experimental/gbiab"
-git branch "$ANNOTATION_NAME" "feature/fungi_clade"
+git branch "$ANNOTATION_NAME" "origin/experimental/gbiab"
 git worktree add "${annotation_enscode_directory}/${repository}" "$ANNOTATION_NAME"
 cd "$enscode_directory"
 

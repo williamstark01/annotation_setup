@@ -167,7 +167,7 @@ git fetch origin
 git worktree prune
 git branch -D "$ANNOTATION_NAME" &>/dev/null || true
 git branch "$ANNOTATION_NAME" "origin/main"
-git worktree add "${annotation_enscode_directory}/${repository}" "$ANNOTATION_NAME"
+git worktree add "${annotation_enscode_directory}/${repository}" -b "$ANNOTATION_NAME"
 cd "$enscode_directory"
 
 repository="ensembl-genes"
@@ -176,10 +176,8 @@ git fetch origin
 git worktree prune
 git branch -D "$ANNOTATION_NAME" &>/dev/null || true
 git branch "$ANNOTATION_NAME" "origin/main"
-git worktree add "${annotation_enscode_directory}/${repository}"  "$ANNOTATION_NAME"
+git worktree add "${annotation_enscode_directory}/${repository}" -b "$ANNOTATION_NAME"
 cd "$enscode_directory"
-
-
 
 repositories=(
     "ensembl"
@@ -237,7 +235,7 @@ fi
 ################################################################################
 
 
-# generate load_genebuild_environment
+# generate load_genebuild_environment.sh
 ################################################################################
 load_environment_path="${ANNOTATION_LOG_DIRECTORY}/load_genebuild_environment.sh"
 cp "${annotations_code_root}/annotation_setup/load_genebuild_environment-template.sh" "$load_environment_path"
@@ -313,7 +311,6 @@ echo '```' >> "$annotation_log_path"
 
 # initialize the pipeline
 ################################################################################
-
 # specify the Python virtual environment to use during annotation
 #pyenv local genebuild
 
@@ -359,7 +356,7 @@ tmux new-session -d -s "$tmux_session_name" -n "pipeline"
 tmux send-keys -t "${tmux_session_name}:pipeline" "source load_genebuild_environment.sh" ENTER
 
 # start the pipeline
-tmux send-keys -t "${tmux_session_name}:pipeline" 'beekeeper.pl -url $EHIVE_URL -loop -analyses_pattern "1..19"' ENTER
+tmux send-keys -t '${tmux_session_name}:pipeline" "beekeeper.pl --url \$EHIVE_URL --loop --analyses_pattern "1..19"' ENTER
 ################################################################################
 
 
