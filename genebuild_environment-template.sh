@@ -1,5 +1,3 @@
-# vim: set filetype=sh :
-
 # Genebuild annotation pipeline execution environment
 
 
@@ -24,35 +22,77 @@ export EHIVE_URL=EHIVE_URL_value
 export EHIVE_PASS="ensembl"
 ################################################################################
 
-# minimal.sh
+
+# genebuild.sh (complete copy)
+################################################################################
+#export GB_HOME=/nfs/production/flicek/ensembl/genebuild
+#export ENSEMBL_ROOT_DIR=/hps/software/users/ensembl/repositories/$USER
+#GB_REPO=/hps/software/users/ensembl/repositories/genebuild
+
+#if [[ -n "$LOCAL_PYENV" ]] && [[ -e "/hps/software/users/ensembl/ensw/latest/envs/minimal.sh" ]]; then
+#  . /hps/software/users/ensembl/ensw/latest/envs/minimal.sh
+#elif [[ -e "/hps/software/users/ensembl/ensw/latest/envs/essential.sh" ]]; then
+#  . /hps/software/users/ensembl/ensw/latest/envs/essential.sh
+#fi
+
+# minimal.sh (complete copy)
 ################################################################################
 export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge
 
-if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh ]; then
-  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh
-fi
-if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh ]; then
-  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
-fi
-if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh ]; then
-  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh
-fi
-if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh ]; then
-  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh
-fi
-################################################################################
-
-### plenv
-#PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
-#if [[ -d "$PLENV_ROOT" ]]; then
-#    export PLENV_ROOT
-##export HOMEBREW_PLENV_ROOT="$PLENV_ROOT"
-#    export PATH="${PLENV_ROOT}/bin:$PATH"
-#    eval "$(plenv init -)"
+# obsolete fix
+#if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh ]; then
+#  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh
 #fi
 
-# genebuild.sh
+#if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh ]; then
+#  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
+#fi
+# Homebrew (ex Linuxbrew)
 ################################################################################
+export HOMEBREW_ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
+export ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
+
+export LINUXBREW_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
+export PATH="$LINUXBREW_HOME/bin:$LINUXBREW_HOME/sbin:$PATH"
+export MANPATH="$LINUXBREW_HOME/share/man:$MANPATH"
+export INFOPATH="$LINUXBREW_HOME/share/info:$INFOPATH"
+################################################################################
+
+#if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh ]; then
+#  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh
+#fi
+# plenv
+################################################################################
+PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
+if [[ -d "$PLENV_ROOT" ]]; then
+    export PLENV_ROOT
+    export HOMEBREW_PLENV_ROOT="$PLENV_ROOT"
+    export PATH="${PLENV_ROOT}/bin:$PATH"
+    eval "$(plenv init -)"
+fi
+
+# Only run if we have brew
+brew_root=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
+if [ -d $brew_root ]; then
+  brew_htslib=$brew_root/opt/htslib
+  if [ -d $brew_htslib ]; then
+    export HTSLIB_DIR=${brew_htslib}
+  fi
+fi
+################################################################################
+
+#if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh ]; then
+#  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh
+#fi
+# MySQL commands
+# https://www.ebi.ac.uk/seqdb/confluence/display/ENS/MySQL+commands
+################################################################################
+mysql_cmd_dir="/hps/software/users/ensembl/ensw/mysql-cmds"
+if [[ -d "$mysql_cmd_dir" ]]; then
+  export PATH="${mysql_cmd_dir}/ensembl/bin:$PATH"
+fi
+################################################################################
+
 export GB_SCRATCH=/hps/nobackup/flicek/ensembl/genebuild
 export BLASTDB_DIR=$GB_SCRATCH/blastdb
 export REPEATMODELER_DIR=$GB_SCRATCH/custom_repeat_libraries/repeatmodeler
@@ -66,25 +106,38 @@ if [[ -n "$LINUXBREW_HOME" ]];then
   export GBLAST_PATH="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew/bin"
 fi
 
-if [[ -d "/nfs/production/panda/ensembl/production/ensemblftp/data_files" ]];then
-  export FTP_DIR="/nfs/production/panda/ensembl/production/ensemblftp/data_files"
+if [[ -d "/nfs/production/flicek/ensembl/production/ensemblftp/data_files" ]];then
+  export FTP_DIR="/nfs/production/flicek/ensembl/production/ensemblftp/data_files"
 fi
 
+#export HIVE_EMAIL="$USER@ebi.ac.uk"
+#export ENSCODE=$ENSEMBL_ROOT_DIR
+#export GENEBUILDER_ID=0
+export PATH="/hps/software/users/ensembl/genebuild/bin:$PATH"
+
+# # Tokens for different services
+# # webhooks for Slack to send notification to any channel
+# export SLACK_GENEBUILD='T0F48FDPE/B9B6N48LR/0zjnSpXiK4OlLKB39NutLGCP'
+# export GSHEETS_CREDENTIALS="$GB_REPO/ensembl-common/private/credentials.json"
+
+#alias dbhc="$GB_REPO/ensembl-common/scripts/dbhc.sh"
+#alias dbcopy="$GB_REPO/ensembl-common/scripts/dbcopy.sh"
+#alias run_testsuite="$GB_REPO/ensembl-common/scripts/run_testsuite.sh"
+
+#alias mkgbdir="mkdir -m 2775"
+
+reload_ensembl_release() {
+  EVERSION=`mysql-ens-meta-prod-1 ensembl_metadata -NB -e "SELECT ensembl_version FROM data_release WHERE is_current = 1 ORDER BY ensembl_version DESC LIMIT 1"`
+  if [[ $EVERSION -gt ${ENSEMBL_RELEASE:-0} ]]; then
+    export ENSEMBL_RELEASE=$EVERSION
+  elif [[ $EVERSION -lt $ENSEMBL_RELEASE ]];then
+    echo "Something is wrong: ENSEMBL_RELEASE=$ENSEMBL_RELEASE and ensembl_production_$EVERSION"
+    return 1
+  fi
+}
+
+reload_ensembl_release
 ################################################################################
-# # Homebrew (Linuxbrew)
-# ################################################################################
-# # /hps/software/users/ensembl/ensw/latest/envs/minimal.sh
-# # /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
-# export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge
-#
-# export HOMEBREW_ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
-# export ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
-#
-#export LINUXBREW_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
-#export PATH="$LINUXBREW_HOME/bin:$LINUXBREW_HOME/sbin:$PATH"
-#export MANPATH="$LINUXBREW_HOME/share/man:$MANPATH"
-#export INFOPATH="$LINUXBREW_HOME/share/info:$INFOPATH"
-# ################################################################################
 
 
 # PERL5LIB
@@ -114,10 +167,11 @@ export PERL5LIB
 ################################################################################
 
 
-# PYTHONPATH
+# Python
 ################################################################################
 PYTHONPATH="${ENSCODE}/ensembl-genes/ensembl_genes"
 export PYTHONPATH
+
 export PYENV_VERSION="genebuild"
 ################################################################################
 
