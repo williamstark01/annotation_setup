@@ -254,12 +254,12 @@ pipeline_config_template_path="${annotation_enscode_directory}/ensembl-analysis/
 #cp --preserve --verbose "$pipeline_config_template_path" "$pipeline_config_path"
 cp --preserve "$pipeline_config_template_path" "$pipeline_config_path"
 
-# load_environment.sh
-load_environment_path="${ANNOTATION_LOG_DIRECTORY}/load_environment.sh"
-cp "${SCRIPT_DIRECTORY}/load_environment-template.sh" "$load_environment_path"
+# anno_environment.sh
+anno_environment_path="${ANNOTATION_LOG_DIRECTORY}/anno_environment.sh"
+cp "${SCRIPT_DIRECTORY}/anno_environment-template.sh" "$anno_environment_path"
 
 git init
-git add EnsemblAnnoBraker_conf.pm load_environment.sh
+git add EnsemblAnnoBraker_conf.pm anno_environment.sh
 git commit --all --message="import config template files"
 echo
 ################################################################################
@@ -314,24 +314,24 @@ sed --in-place -e "s/#my \$current_genebuild  = 0;/my \$current_genebuild  = 1;/
 ################################################################################
 
 
-# update load_environment.sh
+# update anno_environment.sh
 ################################################################################
-sed --in-place -e "s/ASSEMBLY_ACCESSION_value/${ASSEMBLY_ACCESSION}/g" "$load_environment_path"
-sed --in-place -e "s/SCIENTIFIC_NAME_value/${SCIENTIFIC_NAME}/g" "$load_environment_path"
+sed --in-place -e "s/ASSEMBLY_ACCESSION_value/${ASSEMBLY_ACCESSION}/g" "$anno_environment_path"
+sed --in-place -e "s/SCIENTIFIC_NAME_value/${SCIENTIFIC_NAME}/g" "$anno_environment_path"
 
-sed --in-place -e "s/ANNOTATION_NAME_value/${ANNOTATION_NAME}/g" "$load_environment_path"
+sed --in-place -e "s/ANNOTATION_NAME_value/${ANNOTATION_NAME}/g" "$anno_environment_path"
 
-sed --in-place -e "s|ANNOTATION_CODE_DIRECTORY_value|${ANNOTATION_CODE_DIRECTORY}|g" "$load_environment_path"
-sed --in-place -e "s|ANNOTATION_LOG_DIRECTORY_value|${ANNOTATION_LOG_DIRECTORY}|g" "$load_environment_path"
-sed --in-place -e "s|ANNOTATION_DATA_DIRECTORY_value|${ANNOTATION_DATA_DIRECTORY}|g" "$load_environment_path"
+sed --in-place -e "s|ANNOTATION_CODE_DIRECTORY_value|${ANNOTATION_CODE_DIRECTORY}|g" "$anno_environment_path"
+sed --in-place -e "s|ANNOTATION_LOG_DIRECTORY_value|${ANNOTATION_LOG_DIRECTORY}|g" "$anno_environment_path"
+sed --in-place -e "s|ANNOTATION_DATA_DIRECTORY_value|${ANNOTATION_DATA_DIRECTORY}|g" "$anno_environment_path"
 
-sed --in-place -e "s|ENSCODE_value|${annotation_enscode_directory}|g" "$load_environment_path"
+sed --in-place -e "s|ENSCODE_value|${annotation_enscode_directory}|g" "$anno_environment_path"
 ################################################################################
 
 
 # initialize the pipeline
 ################################################################################
-source load_environment.sh
+source anno_environment.sh
 
 eHive_commands_path="$ANNOTATION_LOG_DIRECTORY/eHive_commands.txt"
 
@@ -342,9 +342,9 @@ ehive_url_line=$(grep "EHIVE_URL" "$eHive_commands_path" | grep "bash")
 ehive_url_line_array=(${ehive_url_line//\"/ })
 EHIVE_URL="${ehive_url_line_array[2]}"
 
-sed --in-place -e "s|EHIVE_URL_value|${EHIVE_URL}|g" "$load_environment_path"
+sed --in-place -e "s|EHIVE_URL_value|${EHIVE_URL}|g" "$anno_environment_path"
 
-source load_environment.sh
+source anno_environment.sh
 ################################################################################
 
 
@@ -412,7 +412,7 @@ tmux_session_name=(${ANNOTATION_NAME//./_})
 tmux new-session -d -s "$tmux_session_name" -n "pipeline"
 
 # load environment
-tmux send-keys -t "${tmux_session_name}:pipeline" "source load_environment.sh" ENTER
+tmux send-keys -t "${tmux_session_name}:pipeline" "source anno_environment.sh" ENTER
 
 # start the pipeline
 tmux send-keys -t "${tmux_session_name}:pipeline" "beekeeper.pl --url \$EHIVE_URL --loop" ENTER

@@ -235,22 +235,22 @@ fi
 ################################################################################
 
 
-# generate load_genebuild_environment.sh
+# generate genebuild_environment.sh
 ################################################################################
-load_environment_path="${ANNOTATION_LOG_DIRECTORY}/load_genebuild_environment.sh"
-cp "${annotations_code_root}/annotation_setup/load_genebuild_environment-template.sh" "$load_environment_path"
+genebuild_environment_path="${ANNOTATION_LOG_DIRECTORY}/genebuild_environment.sh"
+cp "${annotations_code_root}/annotation_setup/genebuild_environment-template.sh" "$genebuild_environment_path"
 
-sed --in-place -e "s/ASSEMBLY_ACCESSION_value/${ASSEMBLY_ACCESSION}/g" "$load_environment_path"
-sed --in-place -e "s/SCIENTIFIC_NAME_value/${SCIENTIFIC_NAME}/g" "$load_environment_path"
-sed --in-place -e "s/CLADE_value/${CLADE}/g" "$load_environment_path"
-sed --in-place -e "s/ANNOTATION_NAME_value/${ANNOTATION_NAME}/g" "$load_environment_path"
+sed --in-place -e "s/ASSEMBLY_ACCESSION_value/${ASSEMBLY_ACCESSION}/g" "$genebuild_environment_path"
+sed --in-place -e "s/SCIENTIFIC_NAME_value/${SCIENTIFIC_NAME}/g" "$genebuild_environment_path"
+sed --in-place -e "s/CLADE_value/${CLADE}/g" "$genebuild_environment_path"
+sed --in-place -e "s/ANNOTATION_NAME_value/${ANNOTATION_NAME}/g" "$genebuild_environment_path"
 
-sed --in-place -e "s|ANNOTATION_CODE_DIRECTORY_value|${ANNOTATION_CODE_DIRECTORY}|g" "$load_environment_path"
-sed --in-place -e "s|ANNOTATION_LOG_DIRECTORY_value|${ANNOTATION_LOG_DIRECTORY}|g" "$load_environment_path"
-sed --in-place -e "s|ANNOTATION_DATA_DIRECTORY_value|${ANNOTATION_DATA_DIRECTORY}|g" "$load_environment_path"
+sed --in-place -e "s|ANNOTATION_CODE_DIRECTORY_value|${ANNOTATION_CODE_DIRECTORY}|g" "$genebuild_environment_path"
+sed --in-place -e "s|ANNOTATION_LOG_DIRECTORY_value|${ANNOTATION_LOG_DIRECTORY}|g" "$genebuild_environment_path"
+sed --in-place -e "s|ANNOTATION_DATA_DIRECTORY_value|${ANNOTATION_DATA_DIRECTORY}|g" "$genebuild_environment_path"
 
-sed --in-place -e "s|ENSCODE_value|${annotation_enscode_directory}|g" "$load_environment_path"
-sed --in-place -e "s|SERVER_SET_value|${SERVER_SET}|g" "$load_environment_path"
+sed --in-place -e "s|ENSCODE_value|${annotation_enscode_directory}|g" "$genebuild_environment_path"
+sed --in-place -e "s|SERVER_SET_value|${SERVER_SET}|g" "$genebuild_environment_path"
 ################################################################################
 
 
@@ -314,7 +314,7 @@ echo '```' >> "$annotation_log_path"
 # specify the Python virtual environment to use during annotation
 #pyenv local genebuild
 
-source load_genebuild_environment.sh
+source genebuild_environment.sh
 
 # set the global Python version to genebuild during initialization
 #global_python_version=$(pyenv global)
@@ -329,9 +329,9 @@ ehive_url_line=$(grep "EHIVE_URL" "$pipeline_config_cmds_path")
 ehive_url_line_array=(${ehive_url_line//=/ })
 EHIVE_URL="${ehive_url_line_array[2]}"
 
-sed --in-place -e "s|EHIVE_URL_value|${EHIVE_URL}|g" "$load_environment_path"
+sed --in-place -e "s|EHIVE_URL_value|${EHIVE_URL}|g" "$genebuild_environment_path"
 
-source load_genebuild_environment.sh
+source genebuild_environment.sh
 ################################################################################
 
 
@@ -339,7 +339,7 @@ source load_genebuild_environment.sh
 ################################################################################
 git init
 
-git add annotation_log.md load_genebuild_environment.sh pipeline_config.ini .python-version pipeline_config.ini.cmds
+git add annotation_log.md genebuild_environment.sh pipeline_config.ini .python-version pipeline_config.ini.cmds
 
 git commit --all --message="import annotation config files"
 ################################################################################
@@ -353,7 +353,7 @@ tmux_session_name=(${ANNOTATION_NAME//./_})
 tmux new-session -d -s "$tmux_session_name" -n "pipeline"
 
 # load environment
-tmux send-keys -t "${tmux_session_name}:pipeline" "source load_genebuild_environment.sh" ENTER
+tmux send-keys -t "${tmux_session_name}:pipeline" "source genebuild_environment.sh" ENTER
 
 # start the pipeline
 tmux send-keys -t '${tmux_session_name}:pipeline" "beekeeper.pl --url \$EHIVE_URL --loop --analyses_pattern "1..19"' ENTER
