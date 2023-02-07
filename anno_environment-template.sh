@@ -19,7 +19,7 @@ export EHIVE_PASS="ensembl"
 ################################################################################
 
 
-# minimal.sh
+# minimal.sh (complete copy)
 ################################################################################
 export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge
 
