@@ -48,14 +48,16 @@ fi
 #if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh ]; then
 #  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh
 #fi
-# plenv.sh (complete copy)
+# plenv (updated)
 ################################################################################
-export PLENV_ROOT=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv
-if [ -d "${PLENV_ROOT}" ]; then
-    export HOMEBREW_PLENV_ROOT=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv
-    export PATH="$PLENV_ROOT/bin:$PATH"
+PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
+if [[ -d "$PLENV_ROOT" ]]; then
+    export PLENV_ROOT
+    export HOMEBREW_PLENV_ROOT="$PLENV_ROOT"
+    export PATH="${PLENV_ROOT}/bin:$PATH"
     eval "$(plenv init -)"
 fi
+
 # Only run if we have brew
 brew_root=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
 if [ -d $brew_root ]; then
@@ -116,16 +118,6 @@ reload_ensembl_release() {
 
 reload_ensembl_release
 ################################################################################
-
-
-# ### plenv
-# PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
-# if [[ -d "$PLENV_ROOT" ]]; then
-#     export PLENV_ROOT
-#     #export HOMEBREW_PLENV_ROOT="$PLENV_ROOT"
-#     export PATH="${PLENV_ROOT}/bin:$PATH"
-#     eval "$(plenv init -)"
-# fi
 
 
 # # Homebrew (Linuxbrew)
