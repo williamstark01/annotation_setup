@@ -286,42 +286,56 @@ echo "email_address=${USER}@ebi.ac.uk" >> "$pipeline_config_path"
 ################################################################################
 annotation_log_path="${ANNOTATION_LOG_DIRECTORY}/annotation_log.md"
 
+# generate guiHive URL
+IFS='/' read -r -a ehive_url_array <<< "$EHIVE_URL"
+mysql_url="${ehive_url_array[2]}"
+IFS=':' read -r -a mysql_url_array <<< "$mysql_url"
+db_username="${mysql_url_array[0]}"
+IFS='@' read -r -a host_port_array <<< "${mysql_url_array[1]}"
+db_host="${host_port_array[1]}"
+db_port="${mysql_url_array[2]}"
+db_name="${ehive_url_array[3]}"
+guihive_url="http://guihive.ebi.ac.uk:8080/versions/96/?driver=mysql&username=$db_username&host=$db_host&port=$db_port&dbname=$db_name&passwd=xxxxx"
+
 echo "# $ANNOTATION_NAME" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "$SCIENTIFIC_NAME" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "$ASSEMBLY_ACCESSION" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
-echo "https://www.ncbi.nlm.nih.gov/assembly/$ASSEMBLY_ACCESSION" >> "$annotation_log_path"
+echo "https://www.ncbi.nlm.nih.gov/assembly/${ASSEMBLY_ACCESSION}/" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "https://www.ncbi.nlm.nih.gov/data-hub/genome/${ASSEMBLY_ACCESSION}/" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "https://en.wikipedia.org/wiki/$scientific_name_underscores" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "## annotation" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
+echo "EHIVE_URL" >> "$annotation_log_path"
+echo '```' >> "$annotation_log_path"
+echo "$EHIVE_URL" >> "$annotation_log_path"
+echo '```' >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
+echo "guiHive URL" >> "$annotation_log_path"
+echo "$guihive_url" >> "$annotation_log_path"
+echo "" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo "## $(date '+%Y-%m-%d')" >> "$annotation_log_path"
 echo "" >> "$annotation_log_path"
 echo 'run the pipeline up to analysis 19, "create_transcript_selection_pipeline_job"' >> "$annotation_log_path"
 echo '```' >> "$annotation_log_path"
-echo 'beekeeper.pl -url $EHIVE_URL -loop -analyses_pattern "1..19"' >> "$annotation_log_path"
+echo 'beekeeper.pl --url \$EHIVE_URL --loop --analyses_pattern "1..19"' >> "$annotation_log_path"
 echo '```' >> "$annotation_log_path"
 ################################################################################
 
 
 # initialize the pipeline
 ################################################################################
-# specify the Python virtual environment to use during annotation
-#pyenv local genebuild
-
 source genebuild_environment.sh
 
-# set the global Python version to genebuild during initialization
-#global_python_version=$(pyenv global)
-#pyenv global genebuild
 # run with "-current_genebuild 1" to overwrite existing genebuild annotation
 bsub -q production -Is perl "${ENSCODE}/ensembl-analysis/scripts/genebuild/create_annotation_configs.pl" -config_file pipeline_config.ini
-#pyenv global "$global_python_version"
 
 pipeline_config_cmds_path="${ANNOTATION_LOG_DIRECTORY}/pipeline_config.ini.cmds"
 bsub -q production -Is mv "${annotation_data_clade_directory}/pipeline_config.ini.cmds" "$pipeline_config_cmds_path"
@@ -339,7 +353,7 @@ source genebuild_environment.sh
 ################################################################################
 git init
 
-git add annotation_log.md genebuild_environment.sh pipeline_config.ini .python-version pipeline_config.ini.cmds
+git add annotation_log.md genebuild_environment.sh pipeline_config.ini pipeline_config.ini.cmds
 
 git commit --all --message="import annotation config files"
 ################################################################################
@@ -356,22 +370,21 @@ tmux new-session -d -s "$tmux_session_name" -n "pipeline"
 tmux send-keys -t "${tmux_session_name}:pipeline" "source genebuild_environment.sh" ENTER
 
 # start the pipeline
-tmux send-keys -t '${tmux_session_name}:pipeline" "beekeeper.pl --url \$EHIVE_URL --loop --analyses_pattern "1..19"' ENTER
+tmux send-keys -t "${tmux_session_name}:pipeline" 'beekeeper.pl --url \$EHIVE_URL --loop --analyses_pattern "1..19"' ENTER
 ################################################################################
 
 
 # print information for the user
 ################################################################################
-echo ""
-echo ""
-echo ""
+echo
+echo
+echo
 echo "$ANNOTATION_NAME annotation pipeline started"
-echo ""
+echo
 echo "attach to the annotation tmux session with:"
 echo "tmux attach-session -t $tmux_session_name"
-echo ""
-echo "view the running pipeline in guiHive:"
-echo "http://guihive.ebi.ac.uk:8080/"
-echo "+"
-echo "$EHIVE_URL"
+echo
+echo "view the pipeline in guiHive:"
+echo "$guihive_url"
+echo
 ################################################################################
