@@ -24,30 +24,66 @@ export EHIVE_URL=EHIVE_URL_value
 export EHIVE_PASS="ensembl"
 ################################################################################
 
+# minimal.sh
+################################################################################
+export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge
+
+if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh ]; then
+  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh
+fi
+if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh ]; then
+  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
+fi
+if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh ]; then
+  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh
+fi
+if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh ]; then
+  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh
+fi
+################################################################################
 
 ### plenv
-PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
-if [[ -d "$PLENV_ROOT" ]]; then
-    export PLENV_ROOT
-    #export HOMEBREW_PLENV_ROOT="$PLENV_ROOT"
-    export PATH="${PLENV_ROOT}/bin:$PATH"
-    eval "$(plenv init -)"
+#PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
+#if [[ -d "$PLENV_ROOT" ]]; then
+#    export PLENV_ROOT
+##export HOMEBREW_PLENV_ROOT="$PLENV_ROOT"
+#    export PATH="${PLENV_ROOT}/bin:$PATH"
+#    eval "$(plenv init -)"
+#fi
+
+# genebuild.sh
+################################################################################
+export GB_SCRATCH=/hps/nobackup/flicek/ensembl/genebuild
+export BLASTDB_DIR=$GB_SCRATCH/blastdb
+export REPEATMODELER_DIR=$GB_SCRATCH/custom_repeat_libraries/repeatmodeler
+export LSB_DEFAULTQUEUE="production"
+if [[ -n "$LINUXBREW_HOME" ]];then
+  if [[ -z "$WISECONFIGDIR" ]]; then
+    export PATH="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew/opt/exonerate09/bin:$PATH"
+  fi
+  export BIOPERL_LIB="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew/opt/bioperl-169/libexec"
+  export WISECONFIGDIR="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew/share/genewise"
+  export GBLAST_PATH="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew/bin"
 fi
 
+if [[ -d "/nfs/production/panda/ensembl/production/ensemblftp/data_files" ]];then
+  export FTP_DIR="/nfs/production/panda/ensembl/production/ensemblftp/data_files"
+fi
 
+################################################################################
 # # Homebrew (Linuxbrew)
 # ################################################################################
 # # /hps/software/users/ensembl/ensw/latest/envs/minimal.sh
 # # /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
 # export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge
-# 
+#
 # export HOMEBREW_ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
 # export ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
-# 
-# export LINUXBREW_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
-# export PATH="$LINUXBREW_HOME/bin:$LINUXBREW_HOME/sbin:$PATH"
-# export MANPATH="$LINUXBREW_HOME/share/man:$MANPATH"
-# export INFOPATH="$LINUXBREW_HOME/share/info:$INFOPATH"
+#
+#export LINUXBREW_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
+#export PATH="$LINUXBREW_HOME/bin:$LINUXBREW_HOME/sbin:$PATH"
+#export MANPATH="$LINUXBREW_HOME/share/man:$MANPATH"
+#export INFOPATH="$LINUXBREW_HOME/share/info:$INFOPATH"
 # ################################################################################
 
 
@@ -82,6 +118,7 @@ export PERL5LIB
 ################################################################################
 PYTHONPATH="${ENSCODE}/ensembl-genes/ensembl_genes"
 export PYTHONPATH
+export PYENV_VERSION="genebuild"
 ################################################################################
 
 
