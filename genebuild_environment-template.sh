@@ -39,9 +39,10 @@ export EHIVE_PASS="ensembl"
 ################################################################################
 export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge
 
-if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh ]; then
-  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh
-fi
+# obsolete
+#if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh ]; then
+#  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh
+#fi
 
 #if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh ]; then
 #  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
@@ -80,9 +81,18 @@ if [ -d $brew_root ]; then
 fi
 ################################################################################
 
-if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh ]; then
-  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh
+#if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh ]; then
+#  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh
+#fi
+# mysql-cmds.sh (complete copy)
+################################################################################
+mysql_cmd_dir=/hps/software/users/ensembl/ensw/mysql-cmds
+if [ -d $mysql_cmd_dir ]; then
+  PATH=${mysql_cmd_dir}/ensembl/bin:$PATH
+  export PATH
 fi
+################################################################################
+
 ################################################################################
 
 export GB_SCRATCH=/hps/nobackup/flicek/ensembl/genebuild
