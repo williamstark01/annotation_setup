@@ -39,7 +39,7 @@ export EHIVE_PASS="ensembl"
 ################################################################################
 export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge
 
-# obsolete
+# obsolete fix
 #if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh ]; then
 #  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/bash-fixes.sh
 #fi
@@ -47,7 +47,7 @@ export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybrid
 #if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh ]; then
 #  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
 #fi
-# linuxbrew.sh (complete copy)
+# Homebrew (ex Linuxbrew)
 ################################################################################
 export HOMEBREW_ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
 export ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
@@ -61,7 +61,7 @@ export INFOPATH="$LINUXBREW_HOME/share/info:$INFOPATH"
 #if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh ]; then
 #  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/plenv.sh
 #fi
-# plenv (updated)
+# plenv
 ################################################################################
 PLENV_ROOT="/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/plenv"
 if [[ -d "$PLENV_ROOT" ]]; then
@@ -84,15 +84,13 @@ fi
 #if [ -f /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh ]; then
 #  . /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/mysql-cmds.sh
 #fi
-# mysql-cmds.sh (complete copy)
+# MySQL commands
+# https://www.ebi.ac.uk/seqdb/confluence/display/ENS/MySQL+commands
 ################################################################################
-mysql_cmd_dir=/hps/software/users/ensembl/ensw/mysql-cmds
-if [ -d $mysql_cmd_dir ]; then
-  PATH=${mysql_cmd_dir}/ensembl/bin:$PATH
-  export PATH
+mysql_cmd_dir="/hps/software/users/ensembl/ensw/mysql-cmds"
+if [[ -d "$mysql_cmd_dir" ]]; then
+  export PATH="${mysql_cmd_dir}/ensembl/bin:$PATH"
 fi
-################################################################################
-
 ################################################################################
 
 export GB_SCRATCH=/hps/nobackup/flicek/ensembl/genebuild
@@ -140,30 +138,6 @@ reload_ensembl_release() {
 
 reload_ensembl_release
 ################################################################################
-
-
-# # Homebrew (Linuxbrew)
-# ################################################################################
-# # /hps/software/users/ensembl/ensw/latest/envs/minimal.sh
-# # /hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/envs/linuxbrew.sh
-# export ENSEMBL_SOFTWARE_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge
-#
-# export HOMEBREW_ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
-# export ENSEMBL_MOONSHINE_ARCHIVE=/hps/software/users/ensembl/ensw/ENSEMBL_MOONSHINE_ARCHIVE
-#
-# export LINUXBREW_HOME=/hps/software/users/ensembl/ensw/C8-MAR21-sandybridge/linuxbrew
-# export PATH="$LINUXBREW_HOME/bin:$LINUXBREW_HOME/sbin:$PATH"
-# export MANPATH="$LINUXBREW_HOME/share/man:$MANPATH"
-# export INFOPATH="$LINUXBREW_HOME/share/info:$INFOPATH"
-# ################################################################################
-
-
-# # MySQL commands
-# # https://www.ebi.ac.uk/seqdb/confluence/display/ENS/MySQL+commands
-# mysql_commands_directory="/hps/software/users/ensembl/ensw/mysql-cmds/ensembl/bin"
-# if [[ -d "$mysql_commands_directory" ]]; then
-#     export PATH="$mysql_commands_directory:$PATH"
-# fi
 
 
 # PERL5LIB
