@@ -291,6 +291,9 @@ sed --in-place -e "s/'user'                         => '',/'user' => 'ensadmin',
 # "password" line 63
 sed --in-place -e "s/'password'                     => '',/'password' => 'ensembl',/g" "$pipeline_config_path"
 
+# "pipe_db_name" line 131
+sed --in-place -e "s/'pipe_db_name' => \$self->o('dbowner') . '_' . \$self->o('production_name') . \$self->o('pipeline_name') . '_pipe_' . \$self->o('release_number'),/'pipe_db_name' => \$self->o('dbowner') . '_' . \$self->o('production_name') . '_pipe_' . \$self->o('release_number'),/g" "$pipeline_config_path"
+
 # "input_ids" line 476
 perl -0777 -i -pe "s/-input_ids         => \[\n        #\{'assembly_accession' => 'GCA_910591885.1'\},\n        #\t\{'assembly_accession' => 'GCA_905333015.1'\},\n      \],/-input_ids => \[\{'assembly_accession' => '$ASSEMBLY_ACCESSION'\}\],/igs" "$pipeline_config_path"
 
